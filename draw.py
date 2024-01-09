@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import pandas as pd
 
 
 def split_dict(original_dict, size=21):
@@ -15,14 +16,14 @@ def split_dict(original_dict, size=21):
     return split_dicts
 
 
-def solve_emoji(dict1, dict2):
+def draw_emoji(dict1, dict2):
     j = split_dict(dict1)
     l = split_dict(dict2)
     for x in range(4):
-        draw_emoji(j[x], l[x], x)
+        draw_emoji_x(j[x], l[x], x)
 
 
-def draw_emoji(dict1, dict2, num):
+def draw_emoji_x(dict1, dict2, num):
     # 提取键和值
 
     keys = list(dict1.keys())
@@ -67,4 +68,131 @@ def draw_emoji(dict1, dict2, num):
 
     # 显示图表
     plt.tight_layout()
+    plt.show()
+
+
+def split_dataframe(df, n_parts):
+    # 确定每个部分的大小
+    part_size = len(df) // n_parts
+
+    # 创建包含分割后的DataFrames的列表
+    split_dfs = [df[i * part_size : (i + 1) * part_size] for i in range(n_parts)]
+
+    return split_dfs
+
+
+def draw_bqb(bqb_j, bqb_l):
+    draw_bqb_kinds(bqb_j, bqb_l)
+    plot_total_count(bqb_j, bqb_l)
+    dfs_j = split_dataframe(bqb_j, 4)
+    dfs_l = split_dataframe(bqb_l, 4)
+    for i in range(4):
+        plot_combined_data(dfs_j[i], dfs_l[i], i)
+
+
+def draw_bqb_kinds(df1, df2):
+    # 计算每个df的data列的唯一值数量
+    unique_count_df1 = df1["data"].nunique()
+    unique_count_df2 = df2["data"].nunique()
+
+    # 数据准备用于绘图
+    labels = ["橙子先生", "柠檬女士"]
+    counts = [unique_count_df1, unique_count_df2]
+
+    plt.figure(figsize=(10, 6))
+
+    # 绘制柱状图
+    plt.bar(labels, counts, color=["orange", "yellow"], edgecolor="black")
+
+    # 添加标题和标签
+    title = "表情包种数统计!"
+    plt.title(title)
+    plt.xlabel("水果！")
+    plt.ylabel("用的表情包种数")
+    filepath = "./data/src/" + title + ".png"
+    plt.savefig(filepath, format="png")
+
+    # 显示图表
+    plt.show()
+
+
+def plot_total_count(df1, df2):
+    # 计算每个df的count列的总和
+    total_count_df1 = df1["count"].sum()
+    total_count_df2 = df2["count"].sum()
+
+    # 数据准备用于绘图
+    labels = ["橙子先生", "柠檬女士"]
+    counts = [total_count_df1, total_count_df2]
+
+    plt.figure(figsize=(10, 6))
+
+    # 绘制柱状图
+    plt.bar(labels, counts, color=["orange", "yellow"], edgecolor="black")
+
+    # 添加标题和标签
+    title = "表情包数量统计!"
+    plt.title(title)
+    plt.xlabel("水果！")
+    plt.ylabel("用的表情包数量")
+    filepath = "./data/src/" + title + ".png"
+    plt.savefig(filepath, format="png")
+    # 显示图表
+    plt.show()
+
+
+def plot_combined_data(df1, df2, num):
+    # 合并两个df的data列并去重，创建一个并集
+    combined_data = pd.concat([df1["data"], df2["data"]]).unique()
+
+    # 创建一个字典，用于存储每个data值在两个df中的count总和
+    counts_df1 = {
+        data: df1[df1["data"] == data]["count"].sum() for data in combined_data
+    }
+    counts_df2 = {
+        data: df2[df2["data"] == data]["count"].sum() for data in combined_data
+    }
+
+    # 从1开始编号
+    x_labels = range(1, len(combined_data) + 1)
+
+    # 数据准备用于绘图
+    counts1 = [counts_df1.get(data, 0) for data in combined_data]
+    counts2 = [counts_df2.get(data, 0) for data in combined_data]
+
+    plt.figure(figsize=(20, 6))
+
+    # 绘制柱状图
+    plt.bar(
+        x_labels,
+        counts1,
+        color="orange",
+        width=0.4,
+        label="橙子先生",
+        edgecolor="black",
+    )
+    plt.bar(
+        [x + 0.4 for x in x_labels],
+        counts2,
+        color="yellow",
+        width=0.4,
+        label="柠檬女士",
+        edgecolor="black",
+    )
+
+    # 添加标题和标签
+    title = "不同表情包使用频率 num " + str(num + 1) + " !"
+    plt.title(title)
+    plt.xlabel("表情包编号")
+    plt.ylabel("频率")
+
+    # 将x轴的标签从数字转换为字符串
+    plt.xticks([x + 0.2 for x in x_labels], [str(x) for x in x_labels])
+
+    plt.legend()
+
+    filepath = "./data/src/" + title + ".png"
+    plt.savefig(filepath, format="png")
+
+    # 显示图表
     plt.show()
