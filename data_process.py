@@ -22,16 +22,16 @@ def process_data(df):
     is_sender_1 = df["IsSender"] == 1
     is_sender_0 = df["IsSender"] == 0
     j_df = df[is_sender_1].copy()
-    l_df = df[is_sender_0].copy()
+    n_df = df[is_sender_0].copy()
     j_df = j_df.drop("IsSender", axis=1)
-    l_df = l_df.drop("IsSender", axis=1)
+    n_df = n_df.drop("IsSender", axis=1)
     df_x = df_x.drop("IsSender", axis=1)
 
     df_x = df_x[df_x["data"].apply(not_start_with_msg)]
     df_x["data"] = df_x["data"].apply(remove_bracketed_text_and_count_all)
     df_x = df_x[df_x["data"].apply(len) > 0]
 
-    return j_df, l_df, df_x
+    return j_df, n_df, df_x
 
 
 def not_start_with_msg(value):
