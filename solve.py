@@ -1,3 +1,7 @@
+# 最后编辑：
+# 晋晨曦 2024.1.20 1:59
+# qq：2950171570
+# email：Jin0714@outlook.com  回复随缘
 import jieba as jb
 import re
 from collections import defaultdict
