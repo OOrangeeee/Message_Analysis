@@ -1,3 +1,7 @@
+# 最后编辑：
+# 晋晨曦 2024.1.20 1:58
+# qq：2950171570
+# email：Jin0714@outlook.com  回复随缘
 import matplotlib
 import data_process as dp
 
@@ -22,6 +26,16 @@ def main():
 
     # 实例化解决方案
     s = solve.solve(j_df, n_df, all_df)
+
+    # 分析热度
+    s.process_heat("全部记录")
+    s.process_heat("晋晨曦")
+    s.process_heat("宁静")
+
+    # 分析时间
+    s.process_time("全部记录")
+    s.process_time("晋晨曦")
+    s.process_time("宁静")
 
     # 分析表情包
     s.process_biaoqingbao()

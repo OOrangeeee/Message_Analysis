@@ -1,7 +1,13 @@
+# 最后编辑：
+# 晋晨曦 2024.1.20 1:59
+# qq：2950171570
+# email：Jin0714@outlook.com  回复随缘
 import matplotlib.pyplot as plt
 import pandas as pd
 import stylecloud as sc
 import os
+import seaborn as sns
+import calendar
 
 
 class draw_data:
@@ -47,9 +53,9 @@ class draw_data:
         j = self.split_dict(dict1)
         n = self.split_dict(dict2)
         for x in range(4):
-            self.draw_emoji_x(j[x], n[x], x)
+            self.draw_emoji_tool(j[x], n[x], x)
 
-    def draw_emoji_x(self, dict1, dict2, num):
+    def draw_emoji_tool(self, dict1, dict2, num):
         """
         画emoji图的工作函数
         :param dict1:晋晨曦emoji字典
@@ -96,7 +102,7 @@ class draw_data:
         plt.xticks(x, keys)
         plt.legend()
 
-        filepath = "./data/src/" + title + ".png"
+        filepath = "./data/src/emoji/" + title + ".png"
         plt.savefig(filepath, format="png")
 
         # 显示图表
@@ -184,7 +190,7 @@ class draw_data:
         plt.title(title)
         plt.xlabel("水果！")
         plt.ylabel("用的表情包种数")
-        filepath = "./data/src/" + title + ".png"
+        filepath = "./data/src/表情包/" + title + ".png"
         plt.savefig(filepath, format="png")
 
         # 显示图表
@@ -215,7 +221,7 @@ class draw_data:
         plt.title(title)
         plt.xlabel("水果！")
         plt.ylabel("用的表情包数量")
-        filepath = "./data/src/" + title + ".png"
+        filepath = "./data/src/表情包/" + title + ".png"
         plt.savefig(filepath, format="png")
         # 显示图表
         plt.show()
@@ -275,13 +281,20 @@ class draw_data:
 
         plt.legend()
 
-        filepath = "./data/src/" + title + ".png"
+        filepath = "./data/src/表情包/" + title + ".png"
         plt.savefig(filepath, format="png")
 
         # 显示图表
         plt.show()
 
     def draw_word_cloud(self, df, shape, mode):
+        """
+        画词云
+        :param df: 数据
+        :param shape: 形状
+        :param mode: 模式
+        :return: 无
+        """
         df_using = df.head(200)
         path = "temp.csv"
         df_using.to_csv(path, index=False)
@@ -295,9 +308,212 @@ class draw_data:
             max_words=200,
             max_font_size=120,
             font_path="仓耳与墨 W03.TTF",
-            output_name="data/src/" + mode + "词云.png",
+            output_name="data/src/word/" + mode + "词云.png",
         )
         if os.path.exists(path):
             os.remove(path)
         else:
             print("完蛋")
+
+    def draw_heatmap_all(self, rili_dfs, title, masks):
+        """
+        统调子图函数
+        :param rili_dfs: 日历df
+        :param title: 标题
+        :param masks: 遮罩
+        :return: 无
+        """
+        for i in range(1, 5):
+            self.draw_heatmap_small(rili_dfs[i - 1], title, masks[i - 1], i)
+            pass
+
+    def draw_heatmap_small(self, rili_df, title, mask, num):
+        """
+        画热力子图
+        :param rili_df: 子图数据
+        :param title: 标题
+        :param mask: 遮罩
+        :param num: 编号
+        :return: 无
+        """
+        if title == "晋晨曦":
+            title = "橙子"
+        elif title == "宁静":
+            title = "柠檬"
+        elif title == "全部记录":
+            title = "两个人"
+        if num < 4:
+            time = num + 9
+            year = "2023 "
+        else:
+            time = 1
+            year = "2024 "
+        plt.figure(figsize=(5, 5))
+        plt.title(title + "的聊天热力图 " + year + str(time) + "月 版!!")
+        data = rili_df
+        data = data.fillna(0)
+        data = data.astype(int)
+        sns.heatmap(
+            data=data,
+            mask=mask,
+            vmax=1050,
+            vmin=0,
+            cmap="YlOrRd",
+            linewidths=0.5,
+            linecolor="white",
+            cbar=True,
+            cbar_kws={"label": "信息条数"},
+        )
+        counter = 1  # 初始化计数器
+        for y in range(data.shape[0]):
+            for x in range(data.shape[1]):
+                if not mask[y, x]:  # 如果格子未被遮罩
+                    plt.text(
+                        x + 0.5,
+                        y + 0.5,
+                        str(counter),
+                        ha="center",
+                        va="center",
+                        color="black",
+                    )
+                    counter += 1
+        plt.yticks([])
+        plt.tight_layout()
+        filepath = (
+            "./data/src/热力图/" + title + "的聊天热力图 " + year + str(time) + "月 版!!.png"
+        )
+        plt.savefig(filepath, format="png")
+        plt.show()
+        pass
+
+    def draw_heatmap_big(self, rili_dfs, title, masks):
+        """
+        绘制聊天热度图
+        :param date_range: 日期范围
+        :param date_counts: 每天的条数
+        :return: 无
+        """
+        fig, axes = plt.subplots(2, 2, figsize=(10, 10))
+        if title == "晋晨曦":
+            title = "橙子"
+        elif title == "宁静":
+            title = "柠檬"
+        elif title == "全部记录":
+            title = "两个人"
+        fig.suptitle(title + " 的聊天热力图总览！！")
+
+        for i, month in enumerate(range(10, 14)):
+            row = i // 2
+            col = i % 2
+            ax = axes[row, col]
+            data = rili_dfs[i]
+            data = data.fillna(0)
+            data = data.astype(int)
+            sns.heatmap(
+                data=data,
+                mask=masks[i],
+                vmax=1050,
+                vmin=0,
+                cmap="YlOrRd",
+                linewidths=0.5,
+                linecolor="white",
+                ax=ax,
+                cbar=True,
+                cbar_kws={"label": "信息条数"},
+            )
+            counter = 1
+            for y in range(data.shape[0]):
+                for x in range(data.shape[1]):
+                    if not masks[i][y, x]:  # 如果格子未被遮罩
+                        ax.text(
+                            x + 0.5,
+                            y + 0.5,
+                            str(counter),
+                            ha="center",
+                            va="center",
+                            color="black",
+                        )
+                        counter += 1
+            ax.set_title(
+                f"2023 {calendar.month_name[month if month<13 else month-12]}"
+                if month != 13
+                else f"2024 {calendar.month_name[month if month<13 else month-12]}"
+            )
+            ax.set_yticklabels([])
+            ax.set_aspect("equal")
+        plt.tight_layout()
+        filepath = "./data/src/热力图/" + title + "聊天热力图.png"
+        plt.savefig(filepath, format="png")
+        plt.show()
+
+    def draw_heat_how(self, df, title):
+        """
+        热度变化趋势
+        :param df: 数据
+        :param title: 标题
+        :return: 无
+        """
+        if title == "晋晨曦":
+            title = "橙子"
+        elif title == "宁静":
+            title = "柠檬"
+        elif title == "全部记录":
+            title = "两个人"
+        plt.figure(figsize=(15, 6))
+        plt.ylim(0, 1050)
+        plt.plot(df.index, df["counts"], marker="o")
+
+        plt.title(title + "聊天热度变化趋势")
+        plt.xlabel("时间")
+        plt.ylabel("热度")
+
+        # plt.grid(True)
+        filepath = "./data/src/热力图/" + title + "聊天热度变化趋势.png"
+        plt.savefig(filepath, format="png")
+        plt.show()
+
+    def draw_time_heat(self, time_df, title):
+        """
+        画时间热力图
+        :param time_df: 图数据
+        :param title: 标题
+        :return: 无
+        """
+        if title == "晋晨曦":
+            title = "橙子"
+        elif title == "宁静":
+            title = "柠檬"
+        elif title == "全部记录":
+            title = "两个人"
+        plt.figure(figsize=(10, 3))
+        plt.title(title + "的聊天时间分布热力图!!")
+        data = time_df
+        data = data.fillna(0)
+        data = data.astype(int)
+        sns.heatmap(
+            data=data,
+            vmax=1600,
+            vmin=0,
+            cmap="YlOrRd",
+            linewidths=0.5,
+            linecolor="white",
+            cbar=True,
+            cbar_kws={"label": "信息条数", "orientation": "horizontal"},
+        )
+        # counter = 0  # 初始化计数器
+        # for y in range(data.shape[0]):
+        #     for x in range(data.shape[1]):
+        #         plt.text(
+        #             x + 0.5,
+        #             y + 0.5,
+        #             str(counter),
+        #             ha="center",
+        #             va="center",
+        #             color="black",
+        #         )
+        #         counter += 1
+        plt.yticks([])
+        plt.tight_layout()
+        filepath = "./data/src/time/" + title + "的聊天时间分布热力图!!.png"
+        plt.savefig(filepath, format="png")
+        plt.show()

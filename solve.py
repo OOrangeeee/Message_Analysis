@@ -1,9 +1,12 @@
+# 最后编辑：
+# 晋晨曦 2024.1.20 1:59
+# qq：2950171570
+# email：Jin0714@outlook.com  回复随缘
 import jieba as jb
 import re
 from collections import defaultdict
 import pandas as pd
-import pandas as pd
-import jieba
+import numpy as np
 
 import draw
 import save
@@ -259,8 +262,160 @@ class solve:
         self.sa.save_data_all(sava_data, sava_path)
         self.d.draw_word_cloud(self.words.copy(), shape, mode)
 
+    # 分析热度
+
+    def make_date_df(self, date_counts):
+        """
+        生成日历df
+        :param date_counts: 每天的count
+        :return: 结果
+        """
+        days = ["0", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日"]
+        columns_date_df = [days[i] for i in range(1, 8)]
+        df_new = pd.DataFrame(columns=columns_date_df)
+        temp_row = [0] * 7
+        is_has = False
+        for _, row_old in date_counts.iterrows():
+            time = row_old["week_day"] - 1  # 将时间1-7转换为索引0-6
+            count = row_old["counts"]
+            temp_row[time] = count
+            is_has = True
+            if time == 6:  # 如果填充到了星期日，添加行到df_new
+                df_new = pd.concat(
+                    [df_new, pd.DataFrame([temp_row], columns=columns_date_df)],
+                    ignore_index=True,
+                )
+                temp_row = [0] * 7
+                is_has = False
+        # 处理最后一行
+        if is_has:  # 如果最后一行不是全0
+            df_new = pd.concat(
+                [df_new, pd.DataFrame([temp_row], columns=columns_date_df)],
+                ignore_index=True,
+            )
+        # 输出新的DataFrame
+        return df_new
+
+    def make_masks(self, data):
+        """
+        制作遮罩
+        :return: 结果
+        """
+        ans = []
+        array = np.zeros_like(data[0].to_numpy(), dtype=bool)
+        array[0, :6] = True
+        array[5, 2:] = True
+        ans.append(array)
+        array = np.zeros_like(data[1].to_numpy(), dtype=bool)
+        array[0, :2] = True
+        array[4, 4:] = True
+        ans.append(array)
+        array = np.zeros_like(data[2].to_numpy(), dtype=bool)
+        array[0, :4] = True
+        ans.append(array)
+        array = np.zeros_like(data[3].to_numpy(), dtype=bool)
+        array[4, 3:] = True
+        ans.append(array)
+        return ans
+
+    def process_heat(self, mode):
+        """
+        分析聊天热度
+        :param mode: 分析模式
+        :return: 无
+        """
+        if mode == "全部记录":
+            date_df = self.all_df.copy()
+            pass
+        elif mode == "晋晨曦":
+            date_df = self.j_df.copy()
+            pass
+        elif mode == "宁静":
+            date_df = self.n_df.copy()
+            pass
+        else:
+            print("参数错误，退出")
+            return
+        date_df["time"] = pd.to_datetime(date_df["time"])
+        date_df["date"] = date_df["time"].dt.date
+
+        date_range = pd.date_range(start="2023-10-01", end="2024-1-31")
+        date_counts = date_df.groupby("date").size().reindex(date_range, fill_value=0)
+        date_counts = date_counts.to_frame()
+        date_counts = date_counts.reset_index()
+        date_counts.columns = ["time", "counts"]
+        date_counts["week_day"] = date_counts["time"].apply(lambda s: s.weekday() + 1)
+
+        date_counts.sort_values(by="time")
+        date_counts["month"] = date_counts["time"].dt.month
+        date_counts["year"] = date_counts["time"].dt.year
+        date_dfs = [group for _, group in date_counts.groupby(["year", "month"])]
+        rili_dfs = [self.make_date_df(df) for df in date_dfs]
+        mask = self.make_masks(rili_dfs)
+
+        date_counts_no_zeros = date_counts[
+            date_counts["counts"].apply(lambda s: s != 0)
+        ]
+
+        self.d.draw_heat_how(date_counts_no_zeros, mode)
+
+        self.d.draw_heatmap_big(
+            rili_dfs,
+            mode,
+            mask,
+        )
+        self.d.draw_heatmap_all(
+            rili_dfs,
+            mode,
+            mask,
+        )
+
+    # 分析聊天时间
+
+    def process_time(self, mode):
+        """
+        分析聊天热度
+        :param mode: 分析模式
+        :return: 无
+        """
+        if mode == "全部记录":
+            hour_df = self.all_df.copy()
+            pass
+        elif mode == "晋晨曦":
+            hour_df = self.j_df.copy()
+            pass
+        elif mode == "宁静":
+            hour_df = self.n_df.copy()
+            pass
+        else:
+            print("参数错误，退出")
+            return
+        hour_df["time"] = pd.to_datetime(hour_df["time"])
+        hour_df["hour"] = hour_df["time"].dt.hour
+        hour_counts = hour_df.groupby("hour").size().reindex(range(0, 24), fill_value=0)
+        hour_counts = hour_counts.to_frame()
+        hour_counts = hour_counts.reset_index()
+        hour_counts.columns = ["hour", "counts"]
+        hour_counts.sort_values(by="hour")
+        columns_date_df = [str(i) for i in range(0, 24)]
+        hour_df_image = pd.DataFrame(columns=columns_date_df)
+        temp_row = [0] * 24
+        for index, row in hour_counts.iterrows():
+            temp_row[index] = row["counts"]
+        hour_df_image = pd.concat(
+            [hour_df_image, pd.DataFrame([temp_row], columns=columns_date_df)],
+            ignore_index=True,
+        )
+        # print(hour_df_image)
+        # print(hour_counts)
+        self.d.draw_time_heat(hour_df_image, mode)
+
     # 保存数据
     def save_kinds_of_data(self):
+        """
+        保存数据
+        :return:无
+        """
         d_data = [self.n_df.copy(), self.j_df.copy(), self.all_df.copy()]
         d_path = ["data/柠檬.xlsx", "data/橙子.xlsx", "data/all.xlsx"]
         self.sa.save_data_all(d_data, d_path)
