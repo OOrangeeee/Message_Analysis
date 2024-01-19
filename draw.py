@@ -285,6 +285,13 @@ class draw_data:
         plt.show()
 
     def draw_word_cloud(self, df, shape, mode):
+        """
+        画词云
+        :param df: 数据
+        :param shape: 形状
+        :param mode: 模式
+        :return: 无
+        """
         df_using = df.head(200)
         path = "temp.csv"
         df_using.to_csv(path, index=False)
@@ -306,11 +313,26 @@ class draw_data:
             print("完蛋")
 
     def draw_heatmap_all(self, rili_dfs, title, masks):
+        """
+        统调子图函数
+        :param rili_dfs: 日历df
+        :param title: 标题
+        :param masks: 遮罩
+        :return: 无
+        """
         for i in range(1, 5):
             self.draw_heatmap_small(rili_dfs[i - 1], title, masks[i - 1], i)
             pass
 
     def draw_heatmap_small(self, rili_df, title, mask, num):
+        """
+        画热力子图
+        :param rili_df: 子图数据
+        :param title: 标题
+        :param mask: 遮罩
+        :param num: 编号
+        :return: 无
+        """
         if title == "晋晨曦":
             title = "橙子"
         elif title == "宁静":
@@ -378,8 +400,8 @@ class draw_data:
         fig.suptitle(title + " 的聊天热力图总览！！")
 
         for i, month in enumerate(range(10, 14)):
-            row = i // 2  # 行索引
-            col = i % 2  # 列索引
+            row = i // 2
+            col = i % 2
             ax = axes[row, col]
             data = rili_dfs[i]
             data = data.fillna(0)
@@ -396,7 +418,7 @@ class draw_data:
                 cbar=True,
                 cbar_kws={"label": "信息条数"},
             )
-            counter = 1  # 初始化计数器
+            counter = 1
             for y in range(data.shape[0]):
                 for x in range(data.shape[1]):
                     if not masks[i][y, x]:  # 如果格子未被遮罩
@@ -418,5 +440,77 @@ class draw_data:
             ax.set_aspect("equal")
         plt.tight_layout()
         filepath = "./data/src/热力图/" + title + "聊天热力图.png"
+        plt.savefig(filepath, format="png")
+        plt.show()
+
+    def draw_heat_how(self, df, title):
+        """
+        热度变化趋势
+        :param df: 数据
+        :param title: 标题
+        :return: 无
+        """
+        if title == "晋晨曦":
+            title = "橙子"
+        elif title == "宁静":
+            title = "柠檬"
+        elif title == "全部记录":
+            title = "两个人"
+        plt.figure(figsize=(15, 6))
+        plt.ylim(0, 1050)
+        plt.plot(df.index, df["counts"], marker="o")
+
+        plt.title(title + "聊天热度变化趋势")
+        plt.xlabel("时间")
+        plt.ylabel("热度")
+
+        # plt.grid(True)
+        filepath = "./data/src/热力图/" + title + "聊天热度变化趋势.png"
+        plt.savefig(filepath, format="png")
+        plt.show()
+
+    def draw_time_heat(self, time_df, title):
+        """
+        画时间热力图
+        :param time_df: 图数据
+        :param title: 标题
+        :return: 无
+        """
+        if title == "晋晨曦":
+            title = "橙子"
+        elif title == "宁静":
+            title = "柠檬"
+        elif title == "全部记录":
+            title = "两个人"
+        plt.figure(figsize=(10, 3))
+        plt.title(title + "的聊天时间分布热力图!!")
+        data = time_df
+        data = data.fillna(0)
+        data = data.astype(int)
+        sns.heatmap(
+            data=data,
+            vmax=1600,
+            vmin=0,
+            cmap="YlOrRd",
+            linewidths=0.5,
+            linecolor="white",
+            cbar=True,
+            cbar_kws={"label": "信息条数", "orientation": "horizontal"},
+        )
+        # counter = 0  # 初始化计数器
+        # for y in range(data.shape[0]):
+        #     for x in range(data.shape[1]):
+        #         plt.text(
+        #             x + 0.5,
+        #             y + 0.5,
+        #             str(counter),
+        #             ha="center",
+        #             va="center",
+        #             color="black",
+        #         )
+        #         counter += 1
+        plt.yticks([])
+        plt.tight_layout()
+        filepath = "./data/src/time/" + title + "的聊天时间分布热力图!!.png"
         plt.savefig(filepath, format="png")
         plt.show()

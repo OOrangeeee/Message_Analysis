@@ -24,20 +24,25 @@ def main():
     s = solve.solve(j_df, n_df, all_df)
 
     # 分析热度
-    s.process_heat("全部记录")
-    s.process_heat("晋晨曦")
-    s.process_heat("宁静")
+    #s.process_heat("全部记录")
+    #s.process_heat("晋晨曦")
+    #s.process_heat("宁静")
+
+    # 分析时间
+    s.process_time("全部记录")
+    s.process_time("晋晨曦")
+    s.process_time("宁静")
 
     # 分析表情包
-    s.process_biaoqingbao()
+    #s.process_biaoqingbao()
 
     # 分析emoji
-    s.process_emoji()
+    #s.process_emoji()
 
     # 分析词语
-    s.process_words("全部文字")
-    s.process_words("晋晨曦")
-    s.process_words("宁静")
+    #s.process_words("全部文字")
+    #s.process_words("晋晨曦")
+    #s.process_words("宁静")
 
     # 保存
     s.save_kinds_of_data()

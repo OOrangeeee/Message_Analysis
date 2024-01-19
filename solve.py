@@ -347,11 +347,14 @@ class solve:
         date_counts["year"] = date_counts["time"].dt.year
         date_dfs = [group for _, group in date_counts.groupby(["year", "month"])]
         rili_dfs = [self.make_date_df(df) for df in date_dfs]
-        # for df in rili_dfs:
-        #     print(df)
-        # print(date_counts)
-        # print(date_counts)
         mask = self.make_masks(rili_dfs)
+
+        date_counts_no_zeros = date_counts[
+            date_counts["counts"].apply(lambda s: s != 0)
+        ]
+
+        self.d.draw_heat_how(date_counts_no_zeros, mode)
+
         self.d.draw_heatmap_big(
             rili_dfs,
             mode,
@@ -362,6 +365,46 @@ class solve:
             mode,
             mask,
         )
+
+    # 分析聊天时间
+
+    def process_time(self, mode):
+        """
+        分析聊天热度
+        :param mode: 分析模式
+        :return: 无
+        """
+        if mode == "全部记录":
+            hour_df = self.all_df.copy()
+            pass
+        elif mode == "晋晨曦":
+            hour_df = self.j_df.copy()
+            pass
+        elif mode == "宁静":
+            hour_df = self.n_df.copy()
+            pass
+        else:
+            print("参数错误，退出")
+            return
+        hour_df["time"] = pd.to_datetime(hour_df["time"])
+        hour_df["hour"] = hour_df["time"].dt.hour
+        hour_counts = hour_df.groupby("hour").size().reindex(range(0, 24), fill_value=0)
+        hour_counts = hour_counts.to_frame()
+        hour_counts = hour_counts.reset_index()
+        hour_counts.columns = ["hour", "counts"]
+        hour_counts.sort_values(by="hour")
+        columns_date_df = [str(i) for i in range(0, 24)]
+        hour_df_image = pd.DataFrame(columns=columns_date_df)
+        temp_row = [0] * 24
+        for index, row in hour_counts.iterrows():
+            temp_row[index] = row["counts"]
+        hour_df_image = pd.concat(
+            [hour_df_image, pd.DataFrame([temp_row], columns=columns_date_df)],
+            ignore_index=True,
+        )
+        # print(hour_df_image)
+        # print(hour_counts)
+        self.d.draw_time_heat(hour_df_image, mode)
 
     # 保存数据
     def save_kinds_of_data(self):
