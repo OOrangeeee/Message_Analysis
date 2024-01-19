@@ -23,6 +23,11 @@ def main():
     # 实例化解决方案
     s = solve.solve(j_df, n_df, all_df)
 
+    # 分析热度
+    s.process_heat("全部记录")
+    s.process_heat("晋晨曦")
+    s.process_heat("宁静")
+
     # 分析表情包
     s.process_biaoqingbao()
 
