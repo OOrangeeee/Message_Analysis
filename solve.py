@@ -139,7 +139,7 @@ class solve:
         n_df_bqb = n_df_bqb.sort_values(by="count", ascending=False)
 
         save_data = [j_df_bqb, n_df_bqb]
-        save_path = ["data/bqb/bqb_j.xlsx", "data/bqb/bqb_l.xlsx"]
+        save_path = ["./用户数据/data/bqb/bqb_j.xlsx", "./用户数据/data/bqb/bqb_l.xlsx"]
         self.sa.save_data_all(save_data, save_path)
 
         self.d.draw_bqb(j_df_bqb, n_df_bqb)
@@ -231,7 +231,7 @@ class solve:
 
         # 保存
         save_data = [emoji_df_j, emoji_df_l]
-        save_path = ["data/emoji/emoji_j.xlsx", "data/emoji/emoji_l.xlsx"]
+        save_path = ["./用户数据/data/emoji/emoji_j.xlsx", "./用户数据/data/emoji/emoji_l.xlsx"]
         self.sa.save_data_all(save_data, save_path)
 
         self.d.draw_emoji(emoji_j_sorted, emoji_l_sorted)
@@ -277,7 +277,7 @@ class solve:
         self.words.dropna(subset=["data"])
         self.words = self.words[self.words["data"].apply(len) > 1]
         sava_data = [self.words.copy()]
-        sava_path = ["data/word/words_counts.xlsx"]
+        sava_path = ["./用户数据/data/word/words_counts.xlsx"]
         self.sa.save_data_all(sava_data, sava_path)
         self.d.draw_word_cloud(self.words.copy(), shape, mode)
 
@@ -465,7 +465,7 @@ class solve:
             print("参数错误，退出")
             return
         emo_df["emo"] = emo_df["data"].apply(self.analyse_word)
-        path = "data/" + title + "情感分析.xlsx"
+        path = "./用户数据/data/" + title + "情感分析.xlsx"
         emo_df.to_excel(path, index=False)
 
     def is_items(self, s):
@@ -503,7 +503,7 @@ class solve:
         else:
             print("参数错误，退出")
             return
-        path = "data/" + title + "情感分析.xlsx"
+        path = "./用户数据/data/" + title + "情感分析.xlsx"
         if os.path.exists(path):
             print("已有情绪分析文件，不调用API")
         else:
@@ -517,7 +517,7 @@ class solve:
                 self.save_emotion(mode)
             else:
                 print("无API对象,检测是否有API配置文件")
-                path = "api/api.txt"
+                path = "./用户数据/api/api.txt"
                 if os.path.exists(path):
                     print("有API文件，调用API进行情绪分析")
                     key = []
@@ -537,7 +537,7 @@ class solve:
                     self.save_emotion(mode)
                 else:
                     print("无API文件，请输入API")
-                    path = "api/api.txt"
+                    path = "./用户数据/api/api.txt"
                     print("请输入App_ID:", end="")
                     App_ID = input()
                     print("请输入API_KEY:", end="")
@@ -581,5 +581,5 @@ class solve:
         :return:无
         """
         d_data = [self.n_df.copy(), self.j_df.copy(), self.all_df.copy()]
-        d_path = ["data/柠檬.xlsx", "data/橙子.xlsx", "data/all.xlsx"]
+        d_path = ["./用户数据/data/柠檬.xlsx", "./用户数据/data/橙子.xlsx", "./用户数据/data/all.xlsx"]
         self.sa.save_data_all(d_data, d_path)

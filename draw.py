@@ -105,7 +105,7 @@ class draw_data:
         plt.xticks(x, keys)
         plt.legend()
 
-        filepath = "./data/src/emoji/" + title + ".png"
+        filepath = "./用户数据/data/src/emoji/" + title + ".png"
         plt.savefig(filepath, format="png")
 
         # 显示图表
@@ -195,7 +195,7 @@ class draw_data:
         plt.title(title)
         plt.xlabel("水果！")
         plt.ylabel("用的表情包种数")
-        filepath = "./data/src/表情包/" + title + ".png"
+        filepath = "./用户数据/data/src/表情包/" + title + ".png"
         plt.savefig(filepath, format="png")
 
         # 显示图表
@@ -226,7 +226,7 @@ class draw_data:
         plt.title(title)
         plt.xlabel("水果！")
         plt.ylabel("用的表情包数量")
-        filepath = "./data/src/表情包/" + title + ".png"
+        filepath = "./用户数据/data/src/表情包/" + title + ".png"
         plt.savefig(filepath, format="png")
         # 显示图表
         plt.show()
@@ -286,7 +286,7 @@ class draw_data:
 
         plt.legend()
 
-        filepath = "./data/src/表情包/" + title + ".png"
+        filepath = "./用户数据/data/src/表情包/" + title + ".png"
         plt.savefig(filepath, format="png")
 
         # 显示图表
@@ -305,7 +305,7 @@ class draw_data:
         df_using = df.head(200)
         path = "temp.csv"
         df_using.to_csv(path, index=False)
-        output_path = "data/src/word/" + mode + "词云.png"
+        output_path = "./用户数据/data/src/word/" + mode + "词云.png"
         sc.gen_stylecloud(
             file_path=path,
             size=1920,
@@ -394,7 +394,7 @@ class draw_data:
         plt.yticks([])
         plt.tight_layout()
         filepath = (
-            "./data/src/热力图/" + title + "的聊天热力图 " + year + str(time) + "月 版!!.png"
+            "./用户数据/data/src/热力图/" + title + "的聊天热力图 " + year + str(time) + "月 版!!.png"
         )
         plt.savefig(filepath, format="png")
         plt.show()
@@ -456,7 +456,7 @@ class draw_data:
             ax.set_yticklabels([])
             ax.set_aspect("equal")
         plt.tight_layout()
-        filepath = "./data/src/热力图/" + title + "聊天热力图.png"
+        filepath = "./用户数据/data/src/热力图/" + title + "聊天热力图.png"
         plt.savefig(filepath, format="png")
         plt.show()
 
@@ -482,7 +482,7 @@ class draw_data:
         plt.ylabel("热度")
 
         # plt.grid(True)
-        filepath = "./data/src/热力图/" + title + "聊天热度变化趋势.png"
+        filepath = "./用户数据/data/src/热力图/" + title + "聊天热度变化趋势.png"
         plt.savefig(filepath, format="png")
         plt.show()
 
@@ -528,7 +528,7 @@ class draw_data:
         #         counter += 1
         plt.yticks([])
         plt.tight_layout()
-        filepath = "./data/src/time/" + title + "的聊天时间分布热力图!!.png"
+        filepath = "./用户数据/data/src/time/" + title + "的聊天时间分布热力图!!.png"
         plt.savefig(filepath, format="png")
         plt.show()
 
@@ -562,6 +562,6 @@ class draw_data:
 
         plt.title(mode + "情绪占比")
         plt.axis("equal")
-        filepath = "./data/src/emo/" + mode + "的情绪分析图!!.png"
+        filepath = "./用户数据/data/src/emo/" + mode + "的情绪分析图!!.png"
         plt.savefig(filepath, format="png")
         plt.show()
