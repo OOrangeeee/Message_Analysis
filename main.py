@@ -1,5 +1,5 @@
 # 最后编辑：
-# 晋晨曦 2024.1.20 1:58
+# 晋晨曦 2024.1.20 20:28
 # qq：2950171570
 # email：Jin0714@outlook.com  回复随缘
 import matplotlib
@@ -17,8 +17,7 @@ def main():
     matplotlib.rcParams["font.family"] = "SimHei"  # 例如使用 "SimHei" 字体
 
     # 读取数据
-    # path = input()
-    path = "E:\python\Message_Analysis\聊天记录\柠檬头.csv"
+    path = input()
     df = r.read_msg(path)
 
     # 处理数据
@@ -47,6 +46,11 @@ def main():
     s.process_words("全部文字")
     s.process_words("晋晨曦")
     s.process_words("宁静")
+
+    # 情感分析
+    s.process_emo("全部记录")
+    s.process_emo("晋晨曦")
+    s.process_emo("宁静")
 
     # 保存
     s.save_kinds_of_data()

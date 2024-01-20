@@ -1,5 +1,5 @@
 # 最后编辑：
-# 晋晨曦 2024.1.20 1:59
+# 晋晨曦 2024.1.20 20:28
 # qq：2950171570
 # email：Jin0714@outlook.com  回复随缘
 import matplotlib.pyplot as plt
@@ -8,6 +8,7 @@ import stylecloud as sc
 import os
 import seaborn as sns
 import calendar
+from PIL import Image
 
 
 class draw_data:
@@ -23,6 +24,8 @@ class draw_data:
         """
         return "draw_data类实例，用于可视化数据"
         pass
+
+    # 绘制emoji
 
     def split_dict(self, original_dict, size=21):
         """
@@ -108,6 +111,8 @@ class draw_data:
         # 显示图表
         plt.tight_layout()
         plt.show()
+
+    # 绘制表情包
 
     def union_bqb(self, j_df, n_df):
         """
@@ -287,6 +292,8 @@ class draw_data:
         # 显示图表
         plt.show()
 
+    # 绘制词云
+
     def draw_word_cloud(self, df, shape, mode):
         """
         画词云
@@ -298,7 +305,7 @@ class draw_data:
         df_using = df.head(200)
         path = "temp.csv"
         df_using.to_csv(path, index=False)
-
+        output_path = "data/src/word/" + mode + "词云.png"
         sc.gen_stylecloud(
             file_path=path,
             size=1920,
@@ -308,12 +315,18 @@ class draw_data:
             max_words=200,
             max_font_size=120,
             font_path="仓耳与墨 W03.TTF",
-            output_name="data/src/word/" + mode + "词云.png",
+            output_name=output_path,
         )
         if os.path.exists(path):
             os.remove(path)
         else:
             print("完蛋")
+        img = Image.open(output_path)
+        plt.imshow(img)
+        plt.axis("off")  # 不显示坐标轴
+        plt.show()
+
+    # 绘制热力图和变化趋势
 
     def draw_heatmap_all(self, rili_dfs, title, masks):
         """
@@ -515,5 +528,39 @@ class draw_data:
         plt.yticks([])
         plt.tight_layout()
         filepath = "./data/src/time/" + title + "的聊天时间分布热力图!!.png"
+        plt.savefig(filepath, format="png")
+        plt.show()
+
+    # 情绪分析
+
+    def draw_emo(self, df, mode):
+        """
+        绘制饼图
+        :param df: 数据
+        :param mode: 模式
+        :return: 无
+        """
+        df["percentage"] = df["counts"] / df["counts"].sum() * 100
+        colors = {0: "#CFE3C8", 1: "#FFD686", 2: "#E59069"}
+        fig, ax = plt.subplots(figsize=(10, 10))
+        wedges, texts, autotexts = ax.pie(
+            df["percentage"],
+            startangle=140,
+            autopct="%1.1f%%",
+            colors=[colors[rank] for rank in df["rank"]],
+        )
+
+        legend_labels = ["负面", "中立", "正面"]
+        ax.legend(
+            wedges,
+            legend_labels,
+            title="情绪的颜色对应",
+            loc="center left",
+            bbox_to_anchor=(0, 0),
+        )
+
+        plt.title(mode + "情绪占比")
+        plt.axis("equal")
+        filepath = "./data/src/emo/" + mode + "的情绪分析图!!.png"
         plt.savefig(filepath, format="png")
         plt.show()

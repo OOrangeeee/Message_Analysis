@@ -1,5 +1,5 @@
 # 最后编辑：
-# 晋晨曦 2024.1.20 1:59
+# 晋晨曦 2024.1.20 20:28
 # qq：2950171570
 # email：Jin0714@outlook.com  回复随缘
 class save_data:
@@ -17,6 +17,12 @@ class save_data:
         pass
 
     def save_data_all(self, data, path):
+        """
+        保存所有数据
+        :param data: 数据
+        :param path: 路径
+        :return:
+        """
         for d, p in zip(data, path):
             d.to_excel(p, index=False)
         pass

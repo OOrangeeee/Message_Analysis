@@ -1,5 +1,5 @@
 # 最后编辑：
-# 晋晨曦 2024.1.20 1:59
+# 晋晨曦 2024.1.20 20:28
 # qq：2950171570
 # email：Jin0714@outlook.com  回复随缘
 import jieba as jb
@@ -7,6 +7,8 @@ import re
 from collections import defaultdict
 import pandas as pd
 import numpy as np
+from aip import AipNlp
+import os
 
 import draw
 import save
@@ -26,7 +28,12 @@ class solve:
         self.j_df = j_df
         self.n_df = n_df
         self.all_df = all_df
+        self.j_df_clean = pd.DataFrame()
+        self.n_df_clean = pd.DataFrame()
+        self.all_df_clean = pd.DataFrame()
         self.words = pd.DataFrame()
+        self.client = AipNlp(None, None, None)
+        self.clean_data()
         pass
 
     def __str__(self):
@@ -35,6 +42,45 @@ class solve:
         """
         return "solve类实例，用于分析数据"
         pass
+
+    def not_start_with_msg_words(self, value):
+        """
+        判断是否不以<开头
+        :param value: 文本
+        :return: 不以<开头为true，否则flase
+        """
+        return not value.startswith("<")
+
+    def remove_bracketed_text_and_count_words(self, s):
+        """
+        删除所有聊天记录[]中文字
+        :param s:语句
+        :return:删除后的语句
+        """
+        return re.sub(r"\[.*?\]", "", s)
+
+    def clean_data(self):
+        """
+        清洗数据
+        :return:无
+        """
+        self.j_df_clean = self.j_df[
+            self.j_df["data"].apply(self.not_start_with_msg_words)
+        ].copy()
+        self.j_df_clean.loc[:, "data"] = self.j_df_clean["data"].apply(
+            self.remove_bracketed_text_and_count_words
+        )
+        self.j_df_clean = self.j_df_clean[self.j_df_clean["data"].apply(len) > 0]
+
+        self.n_df_clean = self.n_df[
+            self.n_df["data"].apply(self.not_start_with_msg_words)
+        ].copy()
+        self.n_df_clean.loc[:, "data"] = self.n_df_clean["data"].apply(
+            self.remove_bracketed_text_and_count_words
+        )
+        self.n_df_clean = self.n_df_clean[self.n_df_clean["data"].apply(len) > 0]
+
+        self.all_df_clean = self.all_df.copy()
 
     # 表情包分析
 
@@ -192,50 +238,23 @@ class solve:
 
     # 词语分析
 
-    def not_start_with_msg_words(self, value):
-        """
-        判断是否不以<开头
-        :param value: 文本
-        :return: 不以<开头为true，否则flase
-        """
-        return not value.startswith("<")
-
-    def remove_bracketed_text_and_count_words(self, s):
-        """
-        删除所有聊天记录[]中文字
-        :param s:语句
-        :return:删除后的语句
-        """
-        return re.sub(r"\[.*?\]", "", s)
-
     def process_words(self, mode):
         """
         分析语句
         :param mode: 分析模式
         :return: 无
         """
-        self.j_df = self.j_df[self.j_df["data"].apply(self.not_start_with_msg_words)]
-        self.j_df.loc[:, "data"] = self.j_df["data"].apply(
-            self.remove_bracketed_text_and_count_words
-        )
-        self.j_df = self.j_df[self.j_df["data"].apply(len) > 0]
-
-        self.n_df = self.n_df[self.n_df["data"].apply(self.not_start_with_msg_words)]
-        self.n_df.loc[:, "data"] = self.n_df["data"].apply(
-            self.remove_bracketed_text_and_count_words
-        )
-        self.n_df = self.n_df[self.n_df["data"].apply(len) > 0]
 
         if mode == "全部文字":
-            data_words = self.all_df["data"]
+            data_words = self.all_df_clean["data"].copy()
             shape = "fas fa-dog"
             pass
         elif mode == "宁静":
-            data_words = self.n_df["data"]
+            data_words = self.n_df_clean["data"].copy()
             shape = "far fa-lemon"
             pass
         elif mode == "晋晨曦":
-            data_words = self.j_df["data"]
+            data_words = self.j_df_clean["data"].copy()
             shape = "fas fa-paw"
             pass
         else:
@@ -264,7 +283,7 @@ class solve:
 
     # 分析热度
 
-    def make_date_df(self, date_counts):
+    def make_rili_df(self, date_counts):
         """
         生成日历df
         :param date_counts: 每天的count
@@ -350,7 +369,7 @@ class solve:
         date_counts["month"] = date_counts["time"].dt.month
         date_counts["year"] = date_counts["time"].dt.year
         date_dfs = [group for _, group in date_counts.groupby(["year", "month"])]
-        rili_dfs = [self.make_date_df(df) for df in date_dfs]
+        rili_dfs = [self.make_rili_df(df) for df in date_dfs]
         mask = self.make_masks(rili_dfs)
 
         date_counts_no_zeros = date_counts[
@@ -409,6 +428,148 @@ class solve:
         # print(hour_df_image)
         # print(hour_counts)
         self.d.draw_time_heat(hour_df_image, mode)
+
+    # 分析情感
+
+    def analyse_word(self, s):
+        """
+        分析情感
+        :param s:
+        :return:
+        """
+        # print("-------")
+        # print(s)
+        # time.sleep(0.05)
+        result = self.client.sentimentClassify(s)  # 调用api
+        # print("-------")
+        return result
+
+    def save_emotion(self, mode):
+        """
+        生成情感分析文件
+        :return: 无
+        """
+        if mode == "全部记录":
+            emo_df = self.all_df_clean.copy()
+            title = "全部"
+            pass
+        elif mode == "晋晨曦":
+            emo_df = self.j_df_clean.copy()
+            title = "橙子"
+            pass
+        elif mode == "宁静":
+            emo_df = self.n_df_clean.copy()
+            title = "柠檬"
+            pass
+        else:
+            print("参数错误，退出")
+            return
+        emo_df["emo"] = emo_df["data"].apply(self.analyse_word)
+        path = "data/" + title + "情感分析.xlsx"
+        emo_df.to_excel(path, index=False)
+
+    def is_items(self, s):
+        """
+        清洗错误数据
+        :param s: 文本
+        :return: 是否正确
+        """
+        return "items" in s
+
+    def get_sentiment(self, s):
+        """
+        获取倾向
+        :param s:结论
+        :return: 倾向
+        """
+        match = re.search(r"'sentiment': (\d+)", s)
+        return int(match.group(1)) if match else None
+
+    def process_emo(self, mode):
+        """
+        分析情感
+        :param mode: 分析模式
+        :return: 无
+        """
+        if mode == "全部记录":
+            title = "两个人"
+            pass
+        elif mode == "晋晨曦":
+            title = "橙子"
+            pass
+        elif mode == "宁静":
+            title = "柠檬"
+            pass
+        else:
+            print("参数错误，退出")
+            return
+        path = "data/" + title + "情感分析.xlsx"
+        if os.path.exists(path):
+            print("已有情绪分析文件，不调用API")
+        else:
+            print("无情绪文件，检测是否有API对象")
+            if self.client != 0:
+                print("有API对象,进行情感分析")
+                self.save_emotion(mode)
+            else:
+                print("无API对象,检测是否有API配置文件")
+                path = "api/api.txt"
+                if os.path.exists(path):
+                    print("有API文件，调用API进行情绪分析")
+                    key = []
+                    try:
+                        with open(path, "r", encoding="utf-8") as file:
+                            for line in file:
+                                key.append(line.strip())
+                                print(line)
+                    except FileNotFoundError:
+                        print(f"无法打开文件：{path}，文件不存在。")
+                    except Exception as e:
+                        print(f"打开文件时发生错误：{e}")
+                    App_ID = key[0]
+                    API_KEY = key[1]
+                    SECRET_KEY = key[2]
+                    self.client = AipNlp(App_ID, API_KEY, SECRET_KEY)
+                    self.save_emotion(mode)
+                else:
+                    print("无API文件，请输入API")
+                    path = "api/api.txt"
+                    os.makedirs(os.path.dirname(path), exist_ok=True)
+                    print("请输入App_ID:", end="")
+                    App_ID = input()
+                    print("请输入API_KEY:", end="")
+                    API_KEY = input()
+                    print("请输入SECRET_KEY:", end="")
+                    SECRET_KEY = input()
+                    text = App_ID + "\n" + API_KEY + "\n" + SECRET_KEY + "\n"
+                    with open(path, "w") as file:
+                        file.write(text)
+                    key = []
+                    try:
+                        with open(path, "r", encoding="utf-8") as file:
+                            for line in file:
+                                key.append(line.strip())
+                                print(line)
+                    except FileNotFoundError:
+                        print(f"无法打开文件：{path}，文件不存在。")
+                    except Exception as e:
+                        print(f"打开文件时发生错误：{e}")
+                    App_ID = key[0]
+                    API_KEY = key[1]
+                    SECRET_KEY = key[2]
+                    self.client = AipNlp(App_ID, API_KEY, SECRET_KEY)
+                    self.save_emotion(mode)
+        emo_df = pd.read_excel(path)
+        emo_df = emo_df[emo_df["emo"].apply(self.is_items)]
+        emo_df["emo_rank"] = emo_df["emo"].apply(self.get_sentiment)
+        emo_rank_counts = (
+            emo_df.groupby("emo_rank").size().reindex(range(0, 3), fill_value=0)
+        )
+        emo_rank_counts = emo_rank_counts.to_frame()
+        emo_rank_counts = emo_rank_counts.reset_index()
+        emo_rank_counts.columns = ["rank", "counts"]
+        emo_rank_counts.sort_values(by="rank")
+        self.d.draw_emo(emo_rank_counts, title)
 
     # 保存数据
     def save_kinds_of_data(self):
