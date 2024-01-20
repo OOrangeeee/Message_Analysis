@@ -17,6 +17,7 @@ def main():
     matplotlib.rcParams["font.family"] = "SimHei"  # 例如使用 "SimHei" 字体
 
     # 读取数据
+    print("请输入聊天记录路径:", end="")
     path = input()
     df = r.read_msg(path)  # 聊天记录\柠檬头.csv
 
