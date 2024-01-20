@@ -1,5 +1,5 @@
 # 最后编辑：
-# 晋晨曦 2024.1.20 20:28
+# 晋晨曦 2024.1.20 20:43
 # qq：2950171570
 # email：Jin0714@outlook.com  回复随缘
 import matplotlib
@@ -18,7 +18,7 @@ def main():
 
     # 读取数据
     path = input()
-    df = r.read_msg(path)
+    df = r.read_msg(path)  # 聊天记录\柠檬头.csv
 
     # 处理数据
     j_df, n_df, all_df = dp.process_data(df)

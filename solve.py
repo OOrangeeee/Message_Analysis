@@ -1,5 +1,5 @@
 # 最后编辑：
-# 晋晨曦 2024.1.20 20:28
+# 晋晨曦 2024.1.20 20:43
 # qq：2950171570
 # email：Jin0714@outlook.com  回复随缘
 import jieba as jb
@@ -32,7 +32,7 @@ class solve:
         self.n_df_clean = pd.DataFrame()
         self.all_df_clean = pd.DataFrame()
         self.words = pd.DataFrame()
-        self.client = AipNlp(None, None, None)
+        self.client = AipNlp("None", "None", "None")
         self.clean_data()
         pass
 
@@ -534,7 +534,6 @@ class solve:
                 else:
                     print("无API文件，请输入API")
                     path = "api/api.txt"
-                    os.makedirs(os.path.dirname(path), exist_ok=True)
                     print("请输入App_ID:", end="")
                     App_ID = input()
                     print("请输入API_KEY:", end="")
