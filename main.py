@@ -16,18 +16,18 @@ def main():
     :return: 无
     """
     # 初始化程序
-    os.makedirs("api", exist_ok=True)
-    os.makedirs("data", exist_ok=True)
-    os.makedirs("data/bqb", exist_ok=True)
-    os.makedirs("data/emoji", exist_ok=True)
-    os.makedirs("data/src", exist_ok=True)
-    os.makedirs("data/word", exist_ok=True)
-    os.makedirs("data/src/emo", exist_ok=True)
-    os.makedirs("data/src/emoji", exist_ok=True)
-    os.makedirs("data/src/time", exist_ok=True)
-    os.makedirs("data/src/word", exist_ok=True)
-    os.makedirs("data/src/表情包", exist_ok=True)
-    os.makedirs("data/src/热力图", exist_ok=True)
+    os.makedirs("用户数据/api", exist_ok=True)
+    os.makedirs("用户数据/data", exist_ok=True)
+    os.makedirs("用户数据/data/bqb", exist_ok=True)
+    os.makedirs("用户数据/data/emoji", exist_ok=True)
+    os.makedirs("用户数据/data/src", exist_ok=True)
+    os.makedirs("用户数据/data/word", exist_ok=True)
+    os.makedirs("用户数据/data/src/emo", exist_ok=True)
+    os.makedirs("用户数据/data/src/emoji", exist_ok=True)
+    os.makedirs("用户数据/data/src/time", exist_ok=True)
+    os.makedirs("用户数据/data/src/word", exist_ok=True)
+    os.makedirs("用户数据/data/src/表情包", exist_ok=True)
+    os.makedirs("用户数据/data/src/热力图", exist_ok=True)
 
     matplotlib.rcParams["font.family"] = "SimHei"  # 例如使用 "SimHei" 字体
 
