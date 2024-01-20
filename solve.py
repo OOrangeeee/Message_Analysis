@@ -508,7 +508,11 @@ class solve:
             print("已有情绪分析文件，不调用API")
         else:
             print("无情绪文件，检测是否有API对象")
-            if self.client != 0:
+            if (
+                self.client._appId != "None"
+                and self.client._apiKey != "None"
+                and self.client._secretKey != "None"
+            ):
                 print("有API对象,进行情感分析")
                 self.save_emotion(mode)
             else:

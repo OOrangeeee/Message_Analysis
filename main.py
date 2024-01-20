@@ -7,6 +7,7 @@ import data_process as dp
 
 import getMsg as r
 import solve
+import os
 
 
 def main():
@@ -14,6 +15,20 @@ def main():
     主函数
     :return: 无
     """
+    # 初始化程序
+    os.makedirs("api", exist_ok=True)
+    os.makedirs("data", exist_ok=True)
+    os.makedirs("data/bqb", exist_ok=True)
+    os.makedirs("data/emoji", exist_ok=True)
+    os.makedirs("data/src", exist_ok=True)
+    os.makedirs("data/word", exist_ok=True)
+    os.makedirs("data/src/emo", exist_ok=True)
+    os.makedirs("data/src/emoji", exist_ok=True)
+    os.makedirs("data/src/time", exist_ok=True)
+    os.makedirs("data/src/word", exist_ok=True)
+    os.makedirs("data/src/表情包", exist_ok=True)
+    os.makedirs("data/src/热力图", exist_ok=True)
+
     matplotlib.rcParams["font.family"] = "SimHei"  # 例如使用 "SimHei" 字体
 
     # 读取数据

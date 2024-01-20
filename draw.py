@@ -322,6 +322,7 @@ class draw_data:
         else:
             print("完蛋")
         img = Image.open(output_path)
+        plt.figure(figsize=(15, 15))
         plt.imshow(img)
         plt.axis("off")  # 不显示坐标轴
         plt.show()
