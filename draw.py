@@ -38,9 +38,7 @@ class draw_data:
         split_dicts = []
 
         for i in range(0, len(keys), size):
-            # 提取键的子集
             subset_keys = keys[i : i + size]
-            # 使用字典推导式创建新的字典，包含子集键值对
             new_dict = {key: original_dict[key] for key in subset_keys}
             split_dicts.append(new_dict)
 
@@ -74,12 +72,10 @@ class draw_data:
 
         plt.figure(figsize=(10, 6))
 
-        # 设置柱状图的位置
         x = range(len(keys))
-        width = 0.35  # 柱状图的宽度
+        width = 0.35
 
         plt.ylim(0, 500)
-        # 绘制柱状图
         plt.bar(
             [i - width / 2 for i in x],
             values1,
@@ -97,7 +93,6 @@ class draw_data:
             edgecolor="black",
         )
 
-        # 添加图例、标签和标题
         title = "emoji统计！num " + str(num + 1) + " !"
         plt.xlabel("emoji类型")
         plt.ylabel("频率")
@@ -108,7 +103,6 @@ class draw_data:
         filepath = "./用户数据/data/src/emoji/" + title + ".png"
         plt.savefig(filepath, format="png")
 
-        # 显示图表
         plt.tight_layout()
         plt.show()
 
@@ -144,10 +138,8 @@ class draw_data:
         :param n_parts:划分几部分
         :return:划分后的df列表
         """
-        # 确定每个部分的大小
         part_size = len(df) // n_parts
 
-        # 创建包含分割后的DataFrames的列表
         split_dfs = [df[i * part_size : (i + 1) * part_size] for i in range(n_parts)]
 
         return split_dfs
@@ -177,20 +169,16 @@ class draw_data:
         :param df2:宁静df
         :return:无
         """
-        # 计算每个df的data列的唯一值数量
         unique_count_df1 = df1["data"].nunique()
         unique_count_df2 = df2["data"].nunique()
 
-        # 数据准备用于绘图
         labels = ["橙子先生", "柠檬女士"]
         counts = [unique_count_df1, unique_count_df2]
 
         plt.figure(figsize=(10, 6))
 
-        # 绘制柱状图
         plt.bar(labels, counts, color=["orange", "yellow"], edgecolor="black")
 
-        # 添加标题和标签
         title = "表情包种数统计!"
         plt.title(title)
         plt.xlabel("水果！")
@@ -198,7 +186,6 @@ class draw_data:
         filepath = "./用户数据/data/src/表情包/" + title + ".png"
         plt.savefig(filepath, format="png")
 
-        # 显示图表
         plt.show()
 
     def draw_bqb_count(self, df1, df2):
@@ -208,27 +195,22 @@ class draw_data:
         :param df2:宁静数目
         :return:
         """
-        # 计算每个df的count列的总和
         total_count_df1 = df1["count"].sum()
         total_count_df2 = df2["count"].sum()
 
-        # 数据准备用于绘图
         labels = ["橙子先生", "柠檬女士"]
         counts = [total_count_df1, total_count_df2]
 
         plt.figure(figsize=(10, 6))
 
-        # 绘制柱状图
         plt.bar(labels, counts, color=["orange", "yellow"], edgecolor="black")
 
-        # 添加标题和标签
         title = "表情包数量统计!"
         plt.title(title)
         plt.xlabel("水果！")
         plt.ylabel("用的表情包数量")
         filepath = "./用户数据/data/src/表情包/" + title + ".png"
         plt.savefig(filepath, format="png")
-        # 显示图表
         plt.show()
 
     def draw_bqb_details(self, df1, df2, num):
@@ -248,16 +230,13 @@ class draw_data:
             data: df2[df2["data"] == data]["count"].sum() for data in index_data
         }
 
-        # 从1开始编号
         x_labels = range(1, len(index_data) + 1)
 
-        # 数据准备用于绘图
         counts1 = [counts_df1.get(data, 0) for data in index_data]
         counts2 = [counts_df2.get(data, 0) for data in index_data]
 
         plt.figure(figsize=(20, 6))
 
-        # 绘制柱状图
         plt.bar(
             [x + 0.05 for x in x_labels],
             counts1,
@@ -275,13 +254,11 @@ class draw_data:
             edgecolor="black",
         )
 
-        # 添加标题和标签
         title = "不同表情包使用频率 num " + str(num + 1) + " !"
         plt.title(title)
         plt.xlabel("表情包编号")
         plt.ylabel("频率")
 
-        # 将x轴的标签从数字转换为字符串
         plt.xticks([x + 0.2 for x in x_labels], [str(x) for x in x_labels])
 
         plt.legend()
@@ -289,7 +266,6 @@ class draw_data:
         filepath = "./用户数据/data/src/表情包/" + title + ".png"
         plt.savefig(filepath, format="png")
 
-        # 显示图表
         plt.show()
 
     # 绘制词云
@@ -378,7 +354,7 @@ class draw_data:
             cbar=True,
             cbar_kws={"label": "信息条数"},
         )
-        counter = 1  # 初始化计数器
+        counter = 1
         for y in range(data.shape[0]):
             for x in range(data.shape[1]):
                 if not mask[y, x]:  # 如果格子未被遮罩
@@ -403,8 +379,9 @@ class draw_data:
     def draw_heatmap_big(self, rili_dfs, title, masks):
         """
         绘制聊天热度图
-        :param date_range: 日期范围
-        :param date_counts: 每天的条数
+        :param rili_dfs:  多组数据，日历形式
+        :param title: 绘制的标题
+        :param masks: 遮罩位置
         :return: 无
         """
         fig, axes = plt.subplots(2, 2, figsize=(10, 10))

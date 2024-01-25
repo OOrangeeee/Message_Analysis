@@ -4,11 +4,12 @@
 # email：Jin0714@outlook.com  回复随缘
 import pandas as pd
 
+
 def read_msg(path):
-    '''
+    """
     读取数据
     :param path: 数据位置
     :return: df
-    '''
-    lemon=pd.read_csv(path)
+    """
+    lemon = pd.read_csv(path)
     return lemon
