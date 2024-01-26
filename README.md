@@ -261,8 +261,8 @@ main.py
 如果有不懂代码的朋友想使用此软件，本软件也贴心的准备好了打包好的程序，只需要前往此链接，下载压缩包后解压根目录下的**橙子的聊天记录分析器**压缩包，进入**橙子的聊天记录分析器**文件夹中启动**橙子的聊天记录分析器.exe**即可。
 
 ```bash
-链接：https://pan.baidu.com/s/1FvFvYmJrj1CcVb18GyixHQ?pwd=bfat 
-提取码：bfat 
+链接：https://pan.baidu.com/s/1ydmqUXvH4mRnprdP-XHQfA?pwd=0714 
+提取码：0714 
 --来自百度网盘超级会员V6的分享
 ```
 
@@ -277,3 +277,5 @@ https://github.com/LC044/WeChatMsg
 2024.1.20 橙子
 
 >2024.1.25更新
+>2024.1.26更新
+>2024.1.27更新

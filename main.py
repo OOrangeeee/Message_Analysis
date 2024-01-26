@@ -1,5 +1,5 @@
 # 最后编辑：
-# 晋晨曦 2024.1.26 15.46
+# 晋晨曦 2024.1.27 1:34
 # qq：2950171570
 # email：Jin0714@outlook.com  回复随缘
 import matplotlib
@@ -225,6 +225,8 @@ def main():
     # 结束
     e_time = time.time()
     st.show_end(s_time, e_time)
+
+    time.sleep(10)
 
 
 if __name__ == "__main__":
