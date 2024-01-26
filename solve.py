@@ -1,5 +1,5 @@
 # 最后编辑：
-# 晋晨曦 2024.1.20 20:43
+# 晋晨曦 2024.1.26 15.46
 # qq：2950171570
 # email：Jin0714@outlook.com  回复随缘
 import jieba as jb
@@ -9,21 +9,26 @@ import pandas as pd
 import numpy as np
 from aip import AipNlp
 import os
+import time
 
 import draw
 import save
+import calenda as ca
 
 
 class solve:
-    def __init__(self, j_df, n_df, all_df):
+    def __init__(self, j_df, n_df, all_df, name1, name2):
         """
         构造函数
-        :param j_df: 晋晨曦数据
-        :param n_df: 宁静数据
+        :param j_df: name1聊天记录
+        :param n_df: name2聊天记录
+        :param all_df: 全部聊天记录
+        :param name1: 主分析人
+        :param name2: 聊天对象
         """
         self.emoji_j = defaultdict(int)
         self.emoji_l = defaultdict(int)
-        self.d = draw.draw_data()
+        self.d = draw.draw_data(name1, name2)
         self.sa = save.save_data()
         self.j_df = j_df
         self.n_df = n_df
@@ -34,6 +39,13 @@ class solve:
         self.words = pd.DataFrame()
         self.client = AipNlp("None", "None", "None")
         self.clean_data()
+        self.name1 = name1
+        self.name2 = name2
+        self.s_year, self.s_month, self.e_year, self.e_month = self.find_time(
+            self.all_df
+        )
+        self.months = self.find_month()
+        self.months_size = len(self.months)
         pass
 
     def __str__(self):
@@ -81,6 +93,48 @@ class solve:
         self.n_df_clean = self.n_df_clean[self.n_df_clean["data"].apply(len) > 0]
 
         self.all_df_clean = self.all_df.copy()
+
+    def find_time(self, df):
+        """
+        找出时间范围的年月
+        :param df: 数据
+        :return: 年月
+        """
+        earliest_time = df.iloc[0]["time"]
+        latest_time = df.iloc[-1]["time"]
+        earliest_year, earliest_month, _ = earliest_time.split("-")
+        latest_year, latest_month, _ = latest_time.split("-")
+        return (
+            int(earliest_year),
+            int(earliest_month),
+            int(latest_year),
+            int(latest_month),
+        )
+
+    def find_month(self):
+        """
+        找到分析的月份列表
+        :return: 月份列表
+        """
+        months = []
+
+        # 当前的年份和月份
+        current_year, current_month = self.s_year, self.s_month
+
+        # 循环直到当前年月等于结束年月
+        while (current_year, current_month) <= (self.e_year, self.e_month):
+            # 将当前年月添加到列表中
+            months.append((current_year, current_month))
+
+            # 如果当前月份是12月，则进入下一年的1月
+            if current_month == 12:
+                current_year += 1
+                current_month = 1
+            else:
+                # 否则，月份增加1
+                current_month += 1
+
+        return months
 
     # 表情包分析
 
@@ -139,16 +193,23 @@ class solve:
         n_df_bqb = n_df_bqb.sort_values(by="count", ascending=False)
 
         save_data = [j_df_bqb, n_df_bqb]
-        save_path = ["./用户数据/data/bqb/bqb_j.xlsx", "./用户数据/data/bqb/bqb_l.xlsx"]
+        save_path = [
+            "./用户数据/data/bqb/" + self.name1 + "_bqb.xlsx",
+            "./用户数据/data/bqb/" + self.name2 + "_bqb.xlsx",
+        ]
         self.sa.save_data_all(save_data, save_path)
 
-        self.d.draw_bqb(j_df_bqb, n_df_bqb)
+        max_count_j = max(j_df_bqb["count"])
+        max_count_n = max(n_df_bqb["count"])
+        max_count = max(max_count_j, max_count_n)
+
+        self.d.draw_bqb(j_df_bqb, n_df_bqb, int(max_count + 5))
 
     # emoji分析
 
     def remove_bracketed_text_and_count_j(self, s):
         """
-        删除所有晋晨曦聊天记录[]中文字，统计emoji
+        删除所有name1聊天记录[]中文字，统计emoji
         :param s:语句
         :return:删除后的语句
         """
@@ -164,7 +225,7 @@ class solve:
 
     def remove_bracketed_text_and_count_l(self, s):
         """
-        删除所有宁静聊天记录[]中文字，统计emoji
+        删除所有name2聊天记录[]中文字，统计emoji
         :param s:语句
         :return:删除后的语句
         """
@@ -231,10 +292,15 @@ class solve:
 
         # 保存
         save_data = [emoji_df_j, emoji_df_l]
-        save_path = ["./用户数据/data/emoji/emoji_j.xlsx", "./用户数据/data/emoji/emoji_l.xlsx"]
+        save_path = [
+            "./用户数据/data/emoji/" + self.name1 + "_emoji.xlsx",
+            "./用户数据/data/emoji/" + self.name2 + "_emoji.xlsx",
+        ]
         self.sa.save_data_all(save_data, save_path)
 
-        self.d.draw_emoji(emoji_j_sorted, emoji_l_sorted)
+        max_count = max(max(emoji_df_j["count"]), max(emoji_df_l["count"]))
+
+        self.d.draw_emoji(emoji_j_sorted, emoji_l_sorted, int(max_count + 5))
 
     # 词语分析
 
@@ -245,17 +311,20 @@ class solve:
         :return: 无
         """
 
-        if mode == "全部文字":
+        if mode == self.name1 + self.name2:
             data_words = self.all_df_clean["data"].copy()
             shape = "fas fa-dog"
+            title = "两个人"
             pass
-        elif mode == "宁静":
+        elif mode == self.name2:
             data_words = self.n_df_clean["data"].copy()
             shape = "far fa-lemon"
+            title = mode
             pass
-        elif mode == "晋晨曦":
+        elif mode == self.name1:
             data_words = self.j_df_clean["data"].copy()
             shape = "fas fa-paw"
+            title = mode
             pass
         else:
             print("参数错误，退出")
@@ -273,13 +342,13 @@ class solve:
         for data in sorted_ans:
             ans[data[0]] = data[1]
         self.words = pd.DataFrame(list(ans.items()), columns=["data", "counts"])
-        self.words = self.words[self.words["data"].apply(lambda s: s != "主人")]
+        # self.words = self.words[self.words["data"].apply(lambda s: s != "主人")]
         self.words.dropna(subset=["data"])
         self.words = self.words[self.words["data"].apply(len) > 1]
         sava_data = [self.words.copy()]
-        sava_path = ["./用户数据/data/word/words_counts.xlsx"]
+        sava_path = ["./用户数据/data/word/" + title + "_words_counts.xlsx"]
         self.sa.save_data_all(sava_data, sava_path)
-        self.d.draw_word_cloud(self.words.copy(), shape, mode)
+        self.d.draw_word_cloud(self.words.copy(), shape, title)
 
     # 分析热度
 
@@ -315,26 +384,17 @@ class solve:
         # 输出新的DataFrame
         return df_new
 
-    def make_masks(self, data):
+    def make_masks(
+        self,
+    ):
         """
         制作遮罩
         :return: 结果
         """
         ans = []
-        array = np.zeros_like(data[0].to_numpy(), dtype=bool)
-        array[0, :6] = True
-        array[5, 2:] = True
-        ans.append(array)
-        array = np.zeros_like(data[1].to_numpy(), dtype=bool)
-        array[0, :2] = True
-        array[4, 4:] = True
-        ans.append(array)
-        array = np.zeros_like(data[2].to_numpy(), dtype=bool)
-        array[0, :4] = True
-        ans.append(array)
-        array = np.zeros_like(data[3].to_numpy(), dtype=bool)
-        array[4, 3:] = True
-        ans.append(array)
+        for year, month in self.months:
+            now_rili = ca.generate_calendar(year, month)
+            ans.append(now_rili)
         return ans
 
     def process_heat(self, mode):
@@ -343,22 +403,27 @@ class solve:
         :param mode: 分析模式
         :return: 无
         """
-        if mode == "全部记录":
+        if mode == self.name1 + self.name2:
             date_df = self.all_df.copy()
+            title = "两个人"
             pass
-        elif mode == "晋晨曦":
+        elif mode == self.name1:
             date_df = self.j_df.copy()
+            title = mode
             pass
-        elif mode == "宁静":
+        elif mode == self.name2:
             date_df = self.n_df.copy()
+            title = mode
             pass
         else:
             print("参数错误，退出")
             return
         date_df["time"] = pd.to_datetime(date_df["time"])
         date_df["date"] = date_df["time"].dt.date
-
-        date_range = pd.date_range(start="2023-10-01", end="2024-1-31")
+        s_date, e_date = ca.get_month_dates(
+            self.s_year, self.s_month, self.e_year, self.e_month
+        )
+        date_range = pd.date_range(start=s_date, end=e_date)
         date_counts = date_df.groupby("date").size().reindex(date_range, fill_value=0)
         date_counts = date_counts.to_frame()
         date_counts = date_counts.reset_index()
@@ -370,41 +435,51 @@ class solve:
         date_counts["year"] = date_counts["time"].dt.year
         date_dfs = [group for _, group in date_counts.groupby(["year", "month"])]
         rili_dfs = [self.make_rili_df(df) for df in date_dfs]
-        mask = self.make_masks(rili_dfs)
+        max_count = max(date_counts["counts"]) + 50
+        mask = self.make_masks()
 
         date_counts_no_zeros = date_counts[
             date_counts["counts"].apply(lambda s: s != 0)
         ]
 
-        self.d.draw_heat_how(date_counts_no_zeros, mode)
+        self.d.draw_heat_how(date_counts_no_zeros, title, max_count)
 
         self.d.draw_heatmap_big(
             rili_dfs,
-            mode,
+            title,
             mask,
+            self.months_size,
+            self.months,
+            max_count,
         )
         self.d.draw_heatmap_all(
             rili_dfs,
-            mode,
+            title,
             mask,
+            self.months_size,
+            self.months,
+            max_count,
         )
 
     # 分析聊天时间
 
     def process_time(self, mode):
         """
-        分析聊天热度
+        分析聊天热度时间
         :param mode: 分析模式
         :return: 无
         """
-        if mode == "全部记录":
+        if mode == self.name1 + self.name2:
             hour_df = self.all_df.copy()
+            title = "两个人"
             pass
-        elif mode == "晋晨曦":
+        elif mode == self.name1:
             hour_df = self.j_df.copy()
+            title = mode
             pass
-        elif mode == "宁静":
+        elif mode == self.name2:
             hour_df = self.n_df.copy()
+            title = mode
             pass
         else:
             print("参数错误，退出")
@@ -427,9 +502,21 @@ class solve:
         )
         # print(hour_df_image)
         # print(hour_counts)
-        self.d.draw_time_heat(hour_df_image, mode)
+        self.d.draw_time_heat(hour_df_image, title)
 
     # 分析情感
+
+    def set_QPS(self, QPS):
+        """
+        输入QPS
+        :param QPS: 数据
+        :return: 无
+        """
+        QPS = int(QPS)
+        if QPS >= 20:
+            self.QPS = 0
+        else:
+            self.QPS = 1.0 / QPS
 
     def analyse_word(self, s):
         """
@@ -439,7 +526,7 @@ class solve:
         """
         # print("-------")
         # print(s)
-        # time.sleep(0.05)
+        time.sleep(self.QPS)
         result = self.client.sentimentClassify(s)  # 调用api
         # print("-------")
         return result
@@ -449,17 +536,17 @@ class solve:
         生成情感分析文件
         :return: 无
         """
-        if mode == "全部记录":
+        if mode == self.name1 + self.name2:
             emo_df = self.all_df_clean.copy()
             title = "全部"
             pass
-        elif mode == "晋晨曦":
+        elif mode == self.name1:
             emo_df = self.j_df_clean.copy()
-            title = "橙子"
+            title = mode
             pass
-        elif mode == "宁静":
+        elif mode == self.name2:
             emo_df = self.n_df_clean.copy()
-            title = "柠檬"
+            title = mode
             pass
         else:
             print("参数错误，退出")
@@ -491,14 +578,14 @@ class solve:
         :param mode: 分析模式
         :return: 无
         """
-        if mode == "全部记录":
-            title = "两个人"
+        if mode == self.name1 + self.name2:
+            title = "全部"
             pass
-        elif mode == "晋晨曦":
-            title = "橙子"
+        elif mode == self.name1:
+            title = self.name1
             pass
-        elif mode == "宁静":
-            title = "柠檬"
+        elif mode == self.name2:
+            title = self.name2
             pass
         else:
             print("参数错误，退出")
@@ -562,6 +649,7 @@ class solve:
                     SECRET_KEY = key[2]
                     self.client = AipNlp(App_ID, API_KEY, SECRET_KEY)
                     self.save_emotion(mode)
+        path = "./用户数据/data/" + title + "情感分析.xlsx"
         emo_df = pd.read_excel(path)
         emo_df = emo_df[emo_df["emo"].apply(self.is_items)]
         emo_df["emo_rank"] = emo_df["emo"].apply(self.get_sentiment)
@@ -581,5 +669,9 @@ class solve:
         :return:无
         """
         d_data = [self.n_df.copy(), self.j_df.copy(), self.all_df.copy()]
-        d_path = ["./用户数据/data/柠檬.xlsx", "./用户数据/data/橙子.xlsx", "./用户数据/data/all.xlsx"]
+        d_path = [
+            "./用户数据/data/" + self.name2 + ".xlsx",
+            "./用户数据/data/" + self.name1 + ".xlsx",
+            "./用户数据/data/all.xlsx",
+        ]
         self.sa.save_data_all(d_data, d_path)
