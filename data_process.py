@@ -1,5 +1,5 @@
 # 最后编辑：
-# 晋晨曦 2024.1.20 1:58
+# 晋晨曦 2024.1.26 15.46
 # qq：2950171570
 # email：Jin0714@outlook.com  回复随缘
 import re
@@ -34,6 +34,14 @@ def process_data(df):
     df_x = df_x[df_x["data"].apply(not_start_with_msg)]
     df_x["data"] = df_x["data"].apply(remove_bracketed_text_and_count_all)
     df_x = df_x[df_x["data"].apply(len) > 0]
+
+    j_df["time"] = j_df["time"].str.replace("/", "-")
+    n_df["time"] = n_df["time"].str.replace("/", "-")
+    df_x["time"] = df_x["time"].str.replace("/", "-")
+
+    j_df = j_df.reset_index(drop=True)
+    n_df = n_df.reset_index(drop=True)
+    df_x = df_x.reset_index(drop=True)
 
     return j_df, n_df, df_x
 
