@@ -265,7 +265,7 @@ main.py
 为了帮助大家使用，其中还包含了大佬的爬取微信聊天记录的软件（留痕），请大家多多支持大佬的工作。
 
 ```bash
-链接：https://pan.baidu.com/s/1R_9xI3G1XnQIr7LI8Od98A?pwd=0714 
+链接：https://pan.baidu.com/s/1zRRj7sT3snTyQsQFfwD_RA?pwd=0714 
 提取码：0714 
 --来自百度网盘超级会员V6的分享
 ```
