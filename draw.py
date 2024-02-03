@@ -330,7 +330,7 @@ class draw_data:
         """
         for i in range(0, length):
             self.draw_heatmap_small(
-                rili_dfs[i - 1], title, masks[i - 1], months[i], max_count
+                rili_dfs[i], title, masks[i], months[i], max_count
             )
             pass
 
