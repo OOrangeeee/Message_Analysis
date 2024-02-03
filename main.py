@@ -1,5 +1,5 @@
 # 最后编辑：
-# 晋晨曦 2024.1.27 1:34
+# 晋晨曦 2024.2.2 17.13
 # qq：2950171570
 # email：Jin0714@outlook.com  回复随缘
 import matplotlib
@@ -99,6 +99,8 @@ def main():
             print("输入无效，请输入一个数字（1到4之间）。")
     choice = int(choice)
 
+    s.get_max_count_date()
+
     if choice == 1:
         s.process_heat(name1)
     elif choice == 2:
@@ -123,6 +125,8 @@ def main():
         else:
             print("输入无效，请输入一个数字（1到4之间）。")
     choice = int(choice)
+
+    s.get_max_count_time()
 
     if choice == 1:
         s.process_time(name1)

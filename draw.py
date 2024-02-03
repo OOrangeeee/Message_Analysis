@@ -1,5 +1,5 @@
 # 最后编辑：
-# 晋晨曦 2024.1.26 15:46
+# 晋晨曦 2024.2.2 17.13
 # qq：2950171570
 # email：Jin0714@outlook.com  回复随缘
 import matplotlib.pyplot as plt
@@ -329,9 +329,7 @@ class draw_data:
         :return: 无
         """
         for i in range(0, length):
-            self.draw_heatmap_small(
-                rili_dfs[i], title, masks[i], months[i], max_count
-            )
+            self.draw_heatmap_small(rili_dfs[i], title, masks[i], months[i], max_count)
             pass
 
     def draw_heatmap_small(self, rili_df, title, mask, month, max_count):
@@ -443,7 +441,7 @@ class draw_data:
                 ax.set_yticklabels([])
                 ax.set_aspect("equal")
             else:
-                ax.axis('off')
+                ax.axis("off")
 
         fig.text(0.5, 0.01, title + " 的聊天热力图总览！！", ha="center", fontsize=15)
         cbar_ax = fig.add_axes([0.2, 0.90, 0.6, 0.07])
@@ -475,7 +473,7 @@ class draw_data:
         plt.savefig(filepath, format="png")
         plt.show()
 
-    def draw_time_heat(self, time_df, title):
+    def draw_time_heat(self, time_df, title, max_count):
         """
         画时间热力图
         :param time_df: 图数据
@@ -489,7 +487,7 @@ class draw_data:
         data = data.astype(int)
         sns.heatmap(
             data=data,
-            vmax=1600,
+            vmax=max_count,
             vmin=0,
             cmap="YlOrRd",
             linewidths=0.5,

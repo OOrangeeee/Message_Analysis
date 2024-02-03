@@ -1,5 +1,5 @@
 # 最后编辑：
-# 晋晨曦 2024.1.26 15:46
+# 晋晨曦 2024.2.2 17.13
 # qq：2950171570
 # email：Jin0714@outlook.com  回复随缘
 import jieba as jb
@@ -352,6 +352,26 @@ class solve:
 
     # 分析热度
 
+    def get_max_count_date(self):
+        date_df = self.all_df.copy()
+        date_df["time"] = pd.to_datetime(date_df["time"])
+        date_df["date"] = date_df["time"].dt.date
+        s_date, e_date = ca.get_month_dates(
+            self.s_year, self.s_month, self.e_year, self.e_month
+        )
+        date_range = pd.date_range(start=s_date, end=e_date)
+        date_counts = date_df.groupby("date").size().reindex(date_range, fill_value=0)
+        date_counts = date_counts.to_frame()
+        date_counts = date_counts.reset_index()
+        date_counts.columns = ["time", "counts"]
+        date_counts["week_day"] = date_counts["time"].apply(lambda s: s.weekday() + 1)
+        date_counts.sort_values(by="time")
+        date_counts["month"] = date_counts["time"].dt.month
+        date_counts["year"] = date_counts["time"].dt.year
+        date_dfs = [group for _, group in date_counts.groupby(["year", "month"])]
+        max_count = max(date_counts["counts"]) + 50
+        self.max_heat_date = max_count
+
     def make_rili_df(self, date_counts):
         """
         生成日历df
@@ -435,14 +455,13 @@ class solve:
         date_counts["year"] = date_counts["time"].dt.year
         date_dfs = [group for _, group in date_counts.groupby(["year", "month"])]
         rili_dfs = [self.make_rili_df(df) for df in date_dfs]
-        max_count = max(date_counts["counts"]) + 50
         mask = self.make_masks()
 
         date_counts_no_zeros = date_counts[
             date_counts["counts"].apply(lambda s: s != 0)
         ]
 
-        self.d.draw_heat_how(date_counts_no_zeros, title, max_count)
+        self.d.draw_heat_how(date_counts_no_zeros, title, self.max_heat_date)
 
         self.d.draw_heatmap_big(
             rili_dfs,
@@ -450,7 +469,7 @@ class solve:
             mask,
             self.months_size,
             self.months,
-            max_count,
+            self.max_heat_date,
         )
         self.d.draw_heatmap_all(
             rili_dfs,
@@ -458,10 +477,31 @@ class solve:
             mask,
             self.months_size,
             self.months,
-            max_count,
+            self.max_heat_date,
         )
 
     # 分析聊天时间
+
+    def get_max_count_time(self):
+        hour_df = self.all_df.copy()
+        hour_df["time"] = pd.to_datetime(hour_df["time"])
+        hour_df["hour"] = hour_df["time"].dt.hour
+        hour_counts = hour_df.groupby("hour").size().reindex(range(0, 24), fill_value=0)
+        hour_counts = hour_counts.to_frame()
+        hour_counts = hour_counts.reset_index()
+        hour_counts.columns = ["hour", "counts"]
+        hour_counts.sort_values(by="hour")
+        columns_date_df = [str(i) for i in range(0, 24)]
+        hour_df_image = pd.DataFrame(columns=columns_date_df)
+        temp_row = [0] * 24
+        for index, row in hour_counts.iterrows():
+            temp_row[index] = row["counts"]
+        hour_df_image = pd.concat(
+            [hour_df_image, pd.DataFrame([temp_row], columns=columns_date_df)],
+            ignore_index=True,
+        )
+        max_count = hour_df_image.max(axis=1).values[0]
+        self.max_count_time = max_count
 
     def process_time(self, mode):
         """
@@ -500,9 +540,7 @@ class solve:
             [hour_df_image, pd.DataFrame([temp_row], columns=columns_date_df)],
             ignore_index=True,
         )
-        # print(hour_df_image)
-        # print(hour_counts)
-        self.d.draw_time_heat(hour_df_image, title)
+        self.d.draw_time_heat(hour_df_image, title, self.max_count_time)
 
     # 分析情感
 
