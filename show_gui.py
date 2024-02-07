@@ -17,8 +17,9 @@ class ShowGui:
         except (AttributeError, ValueError):
             pass
         self.root = tk.Tk()
-        self.root.title("微信聊天记录分析工具")
+        self.root.title("橙子作品之聊天记录分析")
         self.root.geometry("1600x1200")
+        self.root.iconbitmap('./icon/icon.ico')
         self.shape1 = "fas fa-dog"
         self.shape2 = "far fa-lemon"
         self.shape3 = "fas fa-paw"
