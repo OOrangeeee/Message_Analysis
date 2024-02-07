@@ -321,7 +321,7 @@ class solve:
 
         if mode == self.name1 + self.name2:
             data_words = self.all_df_clean["data"].copy()
-            shape = self.shape1
+            shape = self.shape3
             title = "两个人"
             pass
         elif mode == self.name2:
@@ -331,7 +331,7 @@ class solve:
             pass
         elif mode == self.name1:
             data_words = self.j_df_clean["data"].copy()
-            shape = self.shape3
+            shape = self.shape1
             title = mode
             pass
         else:
