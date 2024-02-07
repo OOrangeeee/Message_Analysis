@@ -5,6 +5,7 @@
 from matplotlib import rcParams
 from os import makedirs
 from show_gui import ShowGui
+from console import no_con
 
 
 def main():
@@ -30,6 +31,8 @@ def main():
     rcParams["font.family"] = str("SimHei")
 
     sh = ShowGui()
+
+    no_con()
 
     sh.show()
 
