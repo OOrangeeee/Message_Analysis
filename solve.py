@@ -41,6 +41,9 @@ class solve:
         self.clean_data()
         self.name1 = name1
         self.name2 = name2
+        self.shape1 = "fas fa-dog"
+        self.shape2 = "fas fa-dog"
+        self.shape3 = "fas fa-paw"
         self.s_year, self.s_month, self.e_year, self.e_month = self.find_time(
             self.all_df
         )
@@ -304,6 +307,11 @@ class solve:
 
     # 词语分析
 
+    def change_shape(self, shape1, shape2, shape3):
+        self.shape1 = shape1
+        self.shape2 = shape2
+        self.shape3 = shape3
+
     def process_words(self, mode):
         """
         分析语句
@@ -313,17 +321,17 @@ class solve:
 
         if mode == self.name1 + self.name2:
             data_words = self.all_df_clean["data"].copy()
-            shape = "fas fa-dog"
+            shape = self.shape1
             title = "两个人"
             pass
         elif mode == self.name2:
             data_words = self.n_df_clean["data"].copy()
-            shape = "far fa-lemon"
+            shape = self.shape2
             title = mode
             pass
         elif mode == self.name1:
             data_words = self.j_df_clean["data"].copy()
-            shape = "fas fa-paw"
+            shape = self.shape3
             title = mode
             pass
         else:
@@ -544,18 +552,6 @@ class solve:
 
     # 分析情感
 
-    def set_QPS(self, QPS):
-        """
-        输入QPS
-        :param QPS: 数据
-        :return: 无
-        """
-        QPS = int(QPS)
-        if QPS >= 20:
-            self.QPS = 0
-        else:
-            self.QPS = 1.0 / QPS
-
     def analyse_word(self, s):
         """
         分析情感
@@ -610,6 +606,16 @@ class solve:
         match = re.search(r"'sentiment': (\d+)", s)
         return int(match.group(1)) if match else None
 
+    def get_api(self, q, a1, a2, a3):
+        QPS = int(q)
+        if QPS >= 20:
+            self.QPS = 0
+        else:
+            self.QPS = 1.0 / QPS
+        self.a1 = a1
+        self.a2 = a2
+        self.a3 = a3
+
     def process_emo(self, mode):
         """
         分析情感
@@ -628,65 +634,18 @@ class solve:
         else:
             print("参数错误，退出")
             return
-        path = "./用户数据/data/" + title + "情感分析.xlsx"
-        if os.path.exists(path):
-            print("已有情绪分析文件，不调用API")
-        else:
-            print("无情绪文件，检测是否有API对象")
-            if (
-                self.client._appId != "None"
-                and self.client._apiKey != "None"
-                and self.client._secretKey != "None"
-            ):
-                print("有API对象,进行情感分析")
-                self.save_emotion(mode)
-            else:
-                print("无API对象,检测是否有API配置文件")
-                path = "./用户数据/api/api.txt"
-                if os.path.exists(path):
-                    print("有API文件，调用API进行情绪分析")
-                    key = []
-                    try:
-                        with open(path, "r", encoding="utf-8") as file:
-                            for line in file:
-                                key.append(line.strip())
-                                print(line)
-                    except FileNotFoundError:
-                        print(f"无法打开文件：{path}，文件不存在。")
-                    except Exception as e:
-                        print(f"打开文件时发生错误：{e}")
-                    App_ID = key[0]
-                    API_KEY = key[1]
-                    SECRET_KEY = key[2]
-                    self.client = AipNlp(App_ID, API_KEY, SECRET_KEY)
-                    self.save_emotion(mode)
-                else:
-                    print("无API文件，请输入API")
-                    path = "./用户数据/api/api.txt"
-                    print("请输入App_ID:", end="")
-                    App_ID = input()
-                    print("请输入API_KEY:", end="")
-                    API_KEY = input()
-                    print("请输入SECRET_KEY:", end="")
-                    SECRET_KEY = input()
-                    text = App_ID + "\n" + API_KEY + "\n" + SECRET_KEY + "\n"
-                    with open(path, "w") as file:
-                        file.write(text)
-                    key = []
-                    try:
-                        with open(path, "r", encoding="utf-8") as file:
-                            for line in file:
-                                key.append(line.strip())
-                                print(line)
-                    except FileNotFoundError:
-                        print(f"无法打开文件：{path}，文件不存在。")
-                    except Exception as e:
-                        print(f"打开文件时发生错误：{e}")
-                    App_ID = key[0]
-                    API_KEY = key[1]
-                    SECRET_KEY = key[2]
-                    self.client = AipNlp(App_ID, API_KEY, SECRET_KEY)
-                    self.save_emotion(mode)
+        App_ID = self.a1
+        API_KEY = self.a2
+        SECRET_KEY = self.a3
+        api_path = "./用户数据/api/api.txt"
+        text = App_ID + "\n" + API_KEY + "\n" + SECRET_KEY + "\n"
+        with open(api_path, "w") as file:
+            file.write(text)
+        self.client = AipNlp(App_ID, API_KEY, SECRET_KEY)
+        print(App_ID)
+        print(API_KEY)
+        print(SECRET_KEY)
+        self.save_emotion(mode)
         path = "./用户数据/data/" + title + "情感分析.xlsx"
         emo_df = pd.read_excel(path)
         emo_df = emo_df[emo_df["emo"].apply(self.is_items)]
