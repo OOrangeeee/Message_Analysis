@@ -2,7 +2,7 @@
 # 晋晨曦 2024.1.20 20:28
 # qq：2950171570
 # email：Jin0714@outlook.com  回复随缘
-import pandas as pd
+from pandas import read_csv
 
 
 def read_msg(path):
@@ -11,5 +11,5 @@ def read_msg(path):
     :param path: 数据位置
     :return: df
     """
-    lemon = pd.read_csv(path)
+    lemon = read_csv(path)
     return lemon

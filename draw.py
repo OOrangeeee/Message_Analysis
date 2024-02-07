@@ -3,13 +3,12 @@
 # qq：2950171570
 # email：Jin0714@outlook.com  回复随缘
 import matplotlib.pyplot as plt
-import pandas as pd
-import stylecloud as sc
-import os
-import seaborn as sns
-import calendar
-from PIL import Image
-import math
+from pandas import Series
+from stylecloud import gen_stylecloud
+from os import path
+from os import remove
+from seaborn import heatmap
+from math import ceil
 
 
 class draw_data:
@@ -111,7 +110,6 @@ class draw_data:
         plt.savefig(filepath, format="png")
 
         plt.tight_layout()
-        plt.show()
 
     # 绘制表情包
 
@@ -122,7 +120,7 @@ class draw_data:
         :param n_df: 宁静df
         :return: 返回结果
         """
-        data_union = pd.Series(list(set(j_df["data"]).union(set(n_df["data"]))))
+        data_union = Series(list(set(j_df["data"]).union(set(n_df["data"]))))
 
         df1_extended = data_union.to_frame(name="data").merge(
             j_df, on="data", how="left"
@@ -196,8 +194,6 @@ class draw_data:
         filepath = "./用户数据/data/src/表情包/" + title + ".png"
         plt.savefig(filepath, format="png")
 
-        plt.show()
-
     def draw_bqb_count(self, df1, df2, max_count):
         """
         表情包数目
@@ -221,7 +217,6 @@ class draw_data:
         plt.ylabel("用的表情包数量")
         filepath = "./用户数据/data/src/表情包/" + title + ".png"
         plt.savefig(filepath, format="png")
-        plt.show()
 
     def draw_bqb_details(self, df1, df2, num, max_count):
         """
@@ -278,8 +273,6 @@ class draw_data:
         filepath = "./用户数据/data/src/表情包/" + title + ".png"
         plt.savefig(filepath, format="png")
 
-        plt.show()
-
     # 绘制词云
 
     def draw_word_cloud(self, df, shape, mode):
@@ -294,11 +287,11 @@ class draw_data:
             df_using = df.head(200)
         else:
             df_using = df
-        path = "temp.csv"
-        df_using.to_csv(path, index=False)
+        f_path = "temp.csv"
+        df_using.to_csv(f_path, index=False)
         output_path = "./用户数据/data/src/word/" + mode + "词云.png"
-        sc.gen_stylecloud(
-            file_path=path,
+        gen_stylecloud(
+            file_path=f_path,
             size=1920,
             icon_name=shape,
             palette="colorbrewer.diverging.Spectral_11",
@@ -308,15 +301,10 @@ class draw_data:
             font_path="仓耳与墨 W03.TTF",
             output_name=output_path,
         )
-        if os.path.exists(path):
-            os.remove(path)
+        if path.exists(f_path):
+            remove(f_path)
         else:
             print("完蛋")
-        img = Image.open(output_path)
-        plt.figure(figsize=(15, 15))
-        plt.imshow(img)
-        plt.axis("off")  # 不显示坐标轴
-        plt.show()
 
     # 绘制热力图和变化趋势
 
@@ -348,7 +336,7 @@ class draw_data:
         data = rili_df
         data = data.fillna(0)
         data = data.astype(int)
-        sns.heatmap(
+        heatmap(
             data=data,
             mask=mask,
             vmax=max_count,
@@ -383,8 +371,6 @@ class draw_data:
             + "月 版!!.png"
         )
         plt.savefig(filepath, format="png")
-        plt.show()
-        pass
 
     def draw_heatmap_big(self, rili_dfs, title, masks, length, months, max_count):
         """
@@ -396,7 +382,7 @@ class draw_data:
         :param months: 月份
         :param max_count: 最大计数
         """
-        rows = math.ceil(length / 4)
+        rows = ceil(length / 4)
         cols = 4
         fig, axes = plt.subplots(rows, cols, figsize=(10, 5 * rows))
 
@@ -413,7 +399,7 @@ class draw_data:
                 data = rili_dfs[i]
                 data = data.fillna(0)
                 data = data.astype(int)
-                sns.heatmap(
+                heatmap(
                     data=data,
                     mask=masks[i],
                     vmax=max_count,
@@ -451,7 +437,6 @@ class draw_data:
         plt.subplots_adjust(bottom=0.1)
         filepath = "./用户数据/data/src/热力图/" + title + "聊天热力图总览.png"
         plt.savefig(filepath, format="png")
-        plt.show()
 
     def draw_heat_how(self, df, title, max_count):
         """
@@ -471,7 +456,6 @@ class draw_data:
         # plt.grid(True)
         filepath = "./用户数据/data/src/热力图/" + title + "聊天热度变化趋势.png"
         plt.savefig(filepath, format="png")
-        plt.show()
 
     def draw_time_heat(self, time_df, title, max_count):
         """
@@ -485,7 +469,7 @@ class draw_data:
         data = time_df
         data = data.fillna(0)
         data = data.astype(int)
-        sns.heatmap(
+        heatmap(
             data=data,
             vmax=max_count,
             vmin=0,
@@ -511,7 +495,6 @@ class draw_data:
         plt.tight_layout()
         filepath = "./用户数据/data/src/time/" + title + "的聊天时间分布热力图!!.png"
         plt.savefig(filepath, format="png")
-        plt.show()
 
     # 情绪分析
 
@@ -545,4 +528,3 @@ class draw_data:
         plt.axis("equal")
         filepath = "./用户数据/data/src/emo/" + mode + "的情绪分析图!!.png"
         plt.savefig(filepath, format="png")
-        plt.show()

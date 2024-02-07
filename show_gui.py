@@ -6,7 +6,6 @@ from ctypes import windll
 from functools import partial
 import getMsg as r
 import solve
-import show
 import data_process as dp
 from webbrowser import open_new_tab
 
@@ -774,37 +773,48 @@ class ShowGui:
     def process_heat(self, choice):
         if choice == 1:
             self.s.process_heat(self.name1)
+            messagebox.showinfo("分析结果", "分析完毕，结果保存在 ./用户数据/data/src/热力图 中，请自行查看！")
         elif choice == 2:
             self.s.process_heat(self.name2)
+            messagebox.showinfo("分析结果", "分析完毕，结果保存在 ./用户数据/data/src/热力图 中，请自行查看！")
         elif choice == 3:
             self.s.process_heat(self.name1 + self.name2)
+            messagebox.showinfo("分析结果", "分析完毕，结果保存在 ./用户数据/data/src/热力图 中，请自行查看！")
         elif choice == 4:
             self.s.process_heat(self.name1)
             self.s.process_heat(self.name2)
             self.s.process_heat(self.name1 + self.name2)
+            messagebox.showinfo("分析结果", "分析完毕，结果保存在 ./用户数据/data/src/热力图 中，请自行查看！")
         self.show_page_process_time()
+
 
     def process_time(self, choice):
         if choice == 1:
             self.s.process_time(self.name1)
+            messagebox.showinfo("分析结果", "分析完毕，结果保存在 ./用户数据/data/src/time 中，请自行查看！")
         elif choice == 2:
             self.s.process_time(self.name2)
+            messagebox.showinfo("分析结果", "分析完毕，结果保存在 ./用户数据/data/src/time 中，请自行查看！")
         elif choice == 3:
             self.s.process_time(self.name1 + self.name2)
+            messagebox.showinfo("分析结果", "分析完毕，结果保存在 ./用户数据/data/src/time 中，请自行查看！")
         elif choice == 4:
             self.s.process_time(self.name1)
             self.s.process_time(self.name2)
             self.s.process_time(self.name1 + self.name2)
+            messagebox.showinfo("分析结果", "分析完毕，结果保存在 ./用户数据/data/src/time 中，请自行查看！")
         self.show_page_process_bqb()
 
     def process_emoji(self, choice):
         if choice == 1:
             self.s.process_emoji()
+            messagebox.showinfo("分析结果", "分析完毕，结果保存在 ./用户数据/data/src/emoji 中，请自行查看！")
         self.show_page_process_word_all()
 
     def process_bqb(self, choice):
         if choice == 1:
             self.s.process_biaoqingbao()
+            messagebox.showinfo("分析结果", "分析完毕，结果保存在 ./用户数据/data/src/表情包 中，请自行查看！")
         self.show_page_process_emoji()
 
     def process_word_all(self, choice):
@@ -818,14 +828,18 @@ class ShowGui:
     def process_word(self, choice):
         if choice == 1:
             self.s.process_words(self.name1)
+            messagebox.showinfo("分析结果", "分析完毕，结果保存在 ./用户数据/data/src/word 中，请自行查看！")
         elif choice == 2:
             self.s.process_words(self.name2)
+            messagebox.showinfo("分析结果", "分析完毕，结果保存在 ./用户数据/data/src/word 中，请自行查看！")
         elif choice == 3:
             self.s.process_words(self.name1 + self.name2)
+            messagebox.showinfo("分析结果", "分析完毕，结果保存在 ./用户数据/data/src/word 中，请自行查看！")
         elif choice == 4:
             self.s.process_words(self.name1)
             self.s.process_words(self.name2)
             self.s.process_words(self.name1 + self.name2)
+            messagebox.showinfo("分析结果", "分析完毕，结果保存在 ./用户数据/data/src/word 中，请自行查看！")
         self.show_page_process_emo_all()
 
     def process_emo(self, choice):
@@ -837,12 +851,16 @@ class ShowGui:
     def process_emo_do(self, choice):
         if choice == 1:
             self.s.process_emo(self.name1)
+            messagebox.showinfo("分析结果", "分析完毕，结果保存在 ./用户数据/data/src/emo 中，请自行查看！")
         elif choice == 2:
             self.s.process_emo(self.name2)
+            messagebox.showinfo("分析结果", "分析完毕，结果保存在 ./用户数据/data/src/emo 中，请自行查看！")
         elif choice == 3:
             self.s.process_emo(self.name1 + self.name2)
+            messagebox.showinfo("分析结果", "分析完毕，结果保存在 ./用户数据/data/src/emo 中，请自行查看！")
         elif choice == 4:
             self.s.process_emo(self.name1)
             self.s.process_emo(self.name2)
             self.s.process_emo(self.name1 + self.name2)
+            messagebox.showinfo("分析结果", "分析完毕，结果保存在 ./用户数据/data/src/emo 中，请自行查看！")
         self.show_page_end_emo_2()

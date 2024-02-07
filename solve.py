@@ -2,14 +2,14 @@
 # 晋晨曦 2024.2.2 17.13
 # qq：2950171570
 # email：Jin0714@outlook.com  回复随缘
-import jieba as jb
-import re
+from jieba import cut
+from re import findall
+from re import sub
+from re import search
 from collections import defaultdict
 import pandas as pd
-import numpy as np
 from aip import AipNlp
-import os
-import time
+from time import sleep
 
 import draw
 import save
@@ -72,7 +72,7 @@ class solve:
         :param s:语句
         :return:删除后的语句
         """
-        return re.sub(r"\[.*?\]", "", s)
+        return sub(r"\[.*?\]", "", s)
 
     def clean_data(self):
         """
@@ -163,7 +163,7 @@ class solve:
         :param text:图片文件
         :return:提取结果
         """
-        match = re.search(r'androidmd5="([^"]*)"', text)
+        match = search(r'androidmd5="([^"]*)"', text)
         return match.group(1) if match else None
 
     def process_biaoqingbao(self):
@@ -217,14 +217,14 @@ class solve:
         :return:删除后的语句
         """
         # 使用正则表达式找到所有被 "[]" 包围的文字
-        bracketed_texts = re.findall(r"\[(.*?)\]", s)
+        bracketed_texts = findall(r"\[(.*?)\]", s)
 
         # 更新统计字典
         for text in bracketed_texts:
             self.emoji_j[text] += 1
 
         # 删除被 "[]" 包围的文字
-        return re.sub(r"\[.*?\]", "", s)
+        return sub(r"\[.*?\]", "", s)
 
     def remove_bracketed_text_and_count_l(self, s):
         """
@@ -233,14 +233,14 @@ class solve:
         :return:删除后的语句
         """
         # 使用正则表达式找到所有被 "[]" 包围的文字
-        bracketed_texts = re.findall(r"\[(.*?)\]", s)
+        bracketed_texts = findall(r"\[(.*?)\]", s)
 
         # 更新统计字典
         for text in bracketed_texts:
             self.emoji_l[text] += 1
 
         # 删除被 "[]" 包围的文字
-        return re.sub(r"\[.*?\]", "", s)
+        return sub(r"\[.*?\]", "", s)
 
     def sort_dicts(self, dict1, dict2):
         """
@@ -339,7 +339,7 @@ class solve:
             return
         ans = {}
         for d in data_words:
-            words = jb.cut(d, cut_all=False)
+            words = cut(d, cut_all=False)
             for w in words:
                 if w in ans and len(w) > 1:
                     ans[w] += 1
@@ -560,7 +560,7 @@ class solve:
         """
         # print("-------")
         # print(s)
-        time.sleep(self.QPS)
+        sleep(self.QPS)
         result = self.client.sentimentClassify(s)  # 调用api
         # print("-------")
         return result
@@ -603,7 +603,7 @@ class solve:
         :param s:结论
         :return: 倾向
         """
-        match = re.search(r"'sentiment': (\d+)", s)
+        match = search(r"'sentiment': (\d+)", s)
         return int(match.group(1)) if match else None
 
     def get_api(self, q, a1, a2, a3):

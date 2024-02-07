@@ -2,8 +2,8 @@
 # 晋晨曦 2024.1.26 15.46
 # qq：2950171570
 # email：Jin0714@outlook.com  回复随缘
-import calendar
-import numpy as np
+from calendar import monthrange
+from numpy import ones
 
 
 def generate_calendar(year, month):
@@ -13,9 +13,9 @@ def generate_calendar(year, month):
     :param month: 月份
     :return: numpy数组
     """
-    first_day_weekday, month_days = calendar.monthrange(year, month)
+    first_day_weekday, month_days = monthrange(year, month)
     rows_needed = ((first_day_weekday + month_days - 1) // 7) + 1
-    calendar_array = np.ones((rows_needed, 7), dtype=int)
+    calendar_array = ones((rows_needed, 7), dtype=int)
     day_counter = 1
 
     for week in range(rows_needed):
@@ -39,7 +39,7 @@ def get_month_dates(year1, month1, year2, month2):
     """
     first_date = f"{year1}-{str(month1).zfill(2)}-01"
 
-    last_day = calendar.monthrange(year2, month2)[1]
+    last_day = monthrange(year2, month2)[1]
     last_date = f"{year2}-{str(month2).zfill(2)}-{last_day}"
 
     return first_date, last_date

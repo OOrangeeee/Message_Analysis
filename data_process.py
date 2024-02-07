@@ -2,7 +2,7 @@
 # 晋晨曦 2024.1.26 15:46
 # qq：2950171570
 # email：Jin0714@outlook.com  回复随缘
-import re
+from re import sub
 
 
 def process_data(df):
@@ -61,4 +61,4 @@ def remove_bracketed_text_and_count_all(s):
     :param s:语句
     :return:删除后的语句
     """
-    return re.sub(r"\[.*?\]", "", s)
+    return sub(r"\[.*?\]", "", s)
